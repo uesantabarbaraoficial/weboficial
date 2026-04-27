@@ -1,0 +1,216 @@
+<style>
+    .tarjeta-btn { background: white; border-radius: 16px; border: 2px solid transparent; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative; overflow: hidden; }
+    .tarjeta-btn:hover { transform: translateY(-8px); border-bottom-color: #0dcaf0; box-shadow: 0 15px 35px rgba(13, 202, 240, 0.15) !important; }
+    .tarjeta-btn.bloqueado { opacity: 0.6; filter: grayscale(100%); cursor: not-allowed; border-bottom-color: #e2e8f0; pointer-events: none; }
+    
+    /* ✨ ESFERAS DE CRISTAL 3D ✨ */
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }
+    
+    /* ✨ FIX DEFINITIVO PARA MÓVILES Y CLIC EN DÍA ✨ */
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background-color: #e2e8f0; }
+    .cal-header-cell { background-color: #f8fafc; padding: 12px 5px; text-align: center; font-weight: bold; color: #475569; font-size: 0.85rem; text-transform: uppercase; }
+    .cal-cell { background-color: white; min-height: 120px; padding: 8px; transition: background-color 0.2s; position: relative; }
+    .cal-cell:hover { background-color: #f1f5f9; }
+    .cal-cell.dia-distinto { background-color: #f8fafc; opacity: 0.6; pointer-events: none; } 
+    .cal-cell.hoy { background-color: #eff6ff; }
+    .cal-dia-numero { font-weight: bold; color: #64748b; font-size: 0.9rem; margin-bottom: 8px; display: inline-block; width: 28px; height: 28px; text-align: center; line-height: 28px; border-radius: 50%; }
+    .cal-cell.hoy .cal-dia-numero { background-color: #0dcaf0; color: white; }
+    .cal-evento-chip { font-size: 0.75rem; padding: 5px 8px; border-radius: 6px; margin-bottom: 4px; cursor: pointer; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; border-left: 3px solid rgba(0,0,0,0.2); transition: transform 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); line-height: 1.2; position: relative; z-index: 5; }
+    .cal-evento-chip:hover { transform: scale(1.02); filter: brightness(0.95); }
+</style>
+
+<div class="row mb-5 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #0dcaf0 0%, #087990 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="burbuja-3d burbuja-3"></div>
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white text-info mb-3 px-3 py-2 shadow-sm fw-bold" style="letter-spacing: 1px; font-size: 0.85rem;">
+                        <i class="bi bi-calendar-range me-1"></i> DIRECCIÓN Y SISTEMA
+                    </span>
+                    <h1 class="fw-bolder mb-2 text-white" id="titulo-calendario-main" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Calendarios de Gestión</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Planificación Escolar, Administrativa y Pedagógica.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="calendario-dashboard" class="row g-4 animate__animated animate__fadeIn justify-content-center"></div>
+
+<div class="row mb-3 d-none animate__animated" id="btn-volver-dashboard">
+    <div class="col-12 text-center text-md-start">
+        <button class="btn btn-white shadow-sm fw-bold text-info border rounded-pill px-4 hover-efecto" onclick="window.ModCalendario.volverDashboard()">
+            <i class="bi bi-arrow-left me-2"></i>Volver al Menú
+        </button>
+    </div>
+</div>
+
+<div id="vista-visor" class="row animate__animated d-none">
+    <div class="col-12">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm border-top border-5 border-info" style="border-radius: 20px;">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <div>
+                    <h5 class="fw-bold text-dark mb-1" id="lbl-titulo-visor"><i class="bi bi-calendar-week text-info me-2"></i> Calendario</h5>
+                    <p class="text-muted small mb-0">Eventos pautados para el período <span class="fw-bold text-primary" id="lbl-periodo-activo">...</span></p>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap w-100 w-md-auto justify-content-center justify-content-md-end">
+                    <button class="btn btn-sm btn-primary shadow-sm fw-bold rounded-pill px-3" onclick="window.ModCalendario.abrirPlanificadorConFecha()">
+                        <i class="bi bi-plus-lg me-1"></i> Actividad
+                    </button>
+                    <button class="btn btn-sm btn-dark shadow-sm fw-bold rounded-pill px-3" onclick="window.ModCalendario.cargaMasiva()">
+                        <i class="bi bi-cloud-arrow-up-fill me-1"></i> Masiva
+                    </button>
+                    <div class="btn-group shadow-sm bg-light rounded-pill p-1 border ms-md-2">
+                        <button class="btn btn-sm btn-info text-white rounded-pill px-3 fw-bold" id="btn-vista-grid" onclick="window.ModCalendario.cambiarVistaModo('grid')"><i class="bi bi-grid-3x3-gap-fill me-1"></i> Cuadrícula</button>
+                        <button class="btn btn-sm btn-light rounded-pill px-3 fw-bold text-muted border-0" id="btn-vista-lista" onclick="window.ModCalendario.cambiarVistaModo('lista')"><i class="bi bi-list-ul me-1"></i> Lista</button>
+                    </div>
+                    <button class="btn btn-sm btn-danger shadow-sm fw-bold px-3 rounded-pill ms-md-2" onclick="window.ModCalendario.imprimirPDF()">
+                        <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF
+                    </button>
+                </div>
+            </div>
+            <div id="area-vista-grid" class="animate__animated animate__fadeIn">
+                <div class="d-flex justify-content-between align-items-center mb-3 bg-light p-2 rounded-4 border">
+                    <button class="btn btn-white border shadow-sm rounded-circle px-3" onclick="window.ModCalendario.cambiarMesGrid(-1)"><i class="bi bi-chevron-left"></i></button>
+                    <h5 class="fw-bold text-dark mb-0 text-capitalize text-center" id="lbl-mes-anio-grid">Mes Año</h5>
+                    <button class="btn btn-white border shadow-sm rounded-circle px-3" onclick="window.ModCalendario.cambiarMesGrid(1)"><i class="bi bi-chevron-right"></i></button>
+                </div>
+                <div class="table-responsive border rounded-4" style="background-color: #e2e8f0;">
+                    <div style="min-width: 900px;"><div id="contenedor-cuadricula-calendario"></div></div>
+                </div>
+            </div>
+            <div id="area-vista-lista" class="d-none animate__animated animate__fadeIn">
+                <div class="table-responsive rounded-4 border border-bottom-0 rounded-bottom-0">
+                    <table class="table table-hover align-middle mb-0" style="min-width: 600px;">
+                        <thead class="bg-light"><tr><th class="ps-3 py-3" style="width: 15%;">Clasificación</th><th class="py-3" style="width: 25%;">Fechas</th><th class="py-3">Actividad / Evento</th><th class="py-3 text-end pe-3" style="width: 15%;">Acción</th></tr></thead>
+                        <tbody id="tabla-eventos"><tr><td colspan="4" class="text-center py-5 text-muted">Cargando eventos...</td></tr></tbody>
+                    </table>
+                </div>
+                <div id="paginacion-eventos" class="d-flex justify-content-between align-items-center p-3 bg-light border border-top-0 rounded-bottom-4 flex-wrap gap-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="vista-planificador" class="d-none" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.7); z-index: 9999; overflow-y: auto; backdrop-filter: blur(5px); padding: 2.5rem 1rem;">
+    
+    <div class="animate__animated animate__zoomIn w-100 mx-auto" style="max-width: 850px;">
+        <div class="tarjeta-modulo p-4 bg-white shadow-lg border-top border-5 border-primary" style="position: relative; border-radius: 20px;">
+            
+            <button class="btn btn-light rounded-circle position-absolute border shadow-sm d-flex align-items-center justify-content-center" style="top: 15px; right: 15px; width: 35px; height: 35px; z-index: 10;" onclick="window.ModCalendario.cerrarPlanificador()">
+                <i class="bi bi-x-lg fw-bold text-danger"></i>
+            </button>
+
+            <h4 class="fw-bold text-dark mb-4 border-bottom pb-3 pe-4 fs-5 fs-md-4">
+                <i class="bi bi-calendar-plus text-primary me-2"></i>Registrar Actividad
+            </h4>
+            
+            <div id="form-planificador-area">
+                <div class="row g-3 g-md-4">
+                    
+                    <div class="col-12 col-md-6">
+                        <label class="fw-bold text-muted small mb-2">Destino</label>
+                        <select id="cal-tipo-calendario" class="form-select bg-light fw-bold text-primary" style="border-radius: 10px; padding: 10px 12px; border: 1px solid #e2e8f0;" onchange="window.ModCalendario.toggleForm()">
+                            <option value="Escolar">Calendario Oficial MPPE</option>
+                            <option value="Administrativo">Calendario Administrativo</option>
+                            <option value="Pedagógico">Calendario Pedagógico</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-12 col-md-6" id="contenedor-estandar-clasificacion">
+                        <label class="fw-bold text-muted small mb-2">Clasificación</label>
+                        <select id="cal-tipo-evento" class="form-select bg-light" style="border-radius: 10px; padding: 10px 12px; border: 1px solid #e2e8f0;">
+                            <option value="Reunión">Reunión / Consejo</option>
+                            <option value="Cívico">Acto Cívico</option>
+                            <option value="Evaluación">Entrega de Notas / Evaluación</option>
+                            <option value="Celebración">Celebración / Fiesta</option>
+                            <option value="Taller">Taller / Formación</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-12 col-md-6 d-none" id="contenedor-admin-cat">
+                        <label class="fw-bold text-warning small mb-2"><i class="bi bi-diagram-3 me-1"></i>Programa / Coordina</label>
+                        <select id="cal-admin-cat" class="form-select bg-light border-warning" style="border-radius: 10px; padding: 10px 12px;" onchange="window.ModCalendario.cambiarCategoriaAdmin()">
+                            <option value="">Seleccione Categoría...</option>
+                            <option value="Colectivo">Colectivo Institucional</option>
+                            <option value="Coordinación">Coordinación</option>
+                            <option value="Brigada">Brigada Estudiantil / Docente</option>
+                            <option value="Comité">Comité</option>
+                            <option value="Docente Particular">Docente Particular</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-12" id="contenedor-compartido-titulo">
+                        <label class="fw-bold text-muted small mb-2">Título de la Actividad</label>
+                        <input type="text" id="cal-titulo" class="form-control" placeholder="Ej: Reunión de Planificación" style="border-radius: 10px; padding: 10px 12px; border: 1px solid #e2e8f0;">
+                    </div>
+                    
+                    <div class="col-12 d-none" id="contenedor-admin-entidad">
+                        <label class="fw-bold text-warning small mb-2"><i class="bi bi-person-check me-1"></i>Responsable Específico</label>
+                        <select id="cal-admin-entidad" class="form-select bg-light border-warning fw-bold" style="border-radius: 10px; padding: 10px 12px;">
+                            <option value="">Seleccione primero la categoría arriba...</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <label class="fw-bold text-muted small mb-2">Inicio</label>
+                        <input type="datetime-local" id="cal-inicio" class="form-control" style="border-radius: 10px; padding: 10px 12px; border: 1px solid #e2e8f0;" onchange="window.ModCalendario.calcularDias()">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="fw-bold text-muted small mb-2">Cierre</label>
+                        <input type="datetime-local" id="cal-fin" class="form-control" style="border-radius: 10px; padding: 10px 12px; border: 1px solid #e2e8f0;" onchange="window.ModCalendario.calcularDias()">
+                    </div>
+                    
+                    <div class="col-12 d-none" id="contenedor-admin-calculos">
+                        <div class="d-flex flex-wrap gap-2 bg-light p-2 rounded-3 border">
+                            <div class="flex-fill text-center px-2">
+                                <span class="d-block small text-muted fw-bold">Días de duración:</span>
+                                <span class="fs-5 fw-bold text-primary" id="cal-dias-act">-</span>
+                            </div>
+                            <div class="flex-fill text-center border-start px-2">
+                                <span class="d-block small text-muted fw-bold">Antelación (días):</span>
+                                <span class="fs-5 fw-bold text-info" id="cal-dias-ant">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12" id="contenedor-estandar-desc">
+                        <label class="fw-bold text-muted small mb-2">Descripción</label>
+                        <textarea id="cal-desc" class="form-control" rows="2" style="border-radius: 10px; padding: 10px 12px; border: 1px solid #e2e8f0;"></textarea>
+                    </div>
+                    
+                    <div class="col-12 d-none" id="contenedor-admin-req-ped">
+                        <label class="fw-bold text-success small mb-2"><i class="bi bi-book me-1"></i>Requerimientos Pedagógicos</label>
+                        <textarea id="cal-admin-req-ped" class="form-control border-success" rows="1" style="border-radius: 10px; padding: 10px 12px;"></textarea>
+                    </div>
+                    <div class="col-12 d-none" id="contenedor-admin-req-log">
+                        <label class="fw-bold text-danger small mb-2"><i class="bi bi-box me-1"></i>Req. Logísticos Administrativos</label>
+                        <textarea id="cal-admin-req-log" class="form-control border-danger" rows="1" style="border-radius: 10px; padding: 10px 12px;"></textarea>
+                    </div>
+                    <div class="col-12 d-none" id="contenedor-admin-obs">
+                        <label class="fw-bold text-muted small mb-2"><i class="bi bi-chat-text me-1"></i>Observaciones</label>
+                        <textarea id="cal-admin-obs" class="form-control bg-light" rows="1" style="border-radius: 10px; padding: 10px 12px; border: 1px solid #e2e8f0;"></textarea>
+                    </div>
+                    
+                    <div class="col-12 pt-2 text-center">
+                        <button class="btn btn-primary w-100 shadow-sm fw-bold fs-6 py-2" style="border-radius: 12px;" id="btn-guardar-evento" onclick="window.ModCalendario.guardarEvento()">
+                            <i class="bi bi-box-arrow-down me-2"></i>Guardar en el Calendario
+                        </button>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,96 @@
+<style>
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }
+    
+    /* CSS PAGINACIÓN */
+    .page-link { color: #475569; border: none; border-radius: 8px; margin: 0 3px; font-weight: bold; transition: all 0.2s; cursor: pointer; }
+    .page-item.active .page-link { background-color: #475569; color: white; box-shadow: 0 4px 10px rgba(71, 85, 105, 0.3); }
+    .page-link:hover:not(.active) { background-color: rgba(71, 85, 105, 0.1); color: #475569; }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #475569 0%, #1e293b 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="burbuja-3d burbuja-3"></div>
+            
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white text-secondary mb-3 px-3 py-2 shadow-sm fw-bold" style="letter-spacing: 1px; font-size: 0.85rem;"><i class="bi bi-shield-lock me-1"></i> SEGURIDAD Y ACCESOS</span>
+                    <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Auditoría del Sistema</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Historial detallado de movimientos y acciones de los usuarios.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row animate__animated animate__fadeInUp">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4 h-100" style="border-top: 5px solid #475569 !important;">
+            <div class="card-header bg-white border-bottom p-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="small fw-bold text-muted mb-1"><i class="bi bi-funnel me-1"></i>Filtrar por Usuario</label>
+                        <select id="filtro-usuario" class="form-select input-moderno" onchange="window.ModAuditoria.aplicarFiltros()">
+                            <option value="TODOS">Todos los usuarios</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="small fw-bold text-muted mb-1"><i class="bi bi-sort-down me-1"></i>Ordenar por</label>
+                        <select id="orden-auditoria" class="form-select input-moderno" onchange="window.ModAuditoria.aplicarFiltros()">
+                            <option value="FECHA_DESC">Más recientes primero</option>
+                            <option value="FECHA_ASC">Más antiguos primero</option>
+                            <option value="ACCION_AZ">Acción (A-Z)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5 text-md-end">
+                        
+                        <button class="btn text-white fw-bold shadow-sm rounded-pill px-3 me-1 hover-efecto" style="background-color: #f59e0b;" onclick="window.ModAuditoria.mantenimientoTotal()" title="Descargar todo en Excel y Vaciar historial">
+                            <i class="bi bi-database-down me-1"></i> Servicio
+                        </button>
+
+                        <button class="btn btn-success fw-bold shadow-sm rounded-pill px-3 me-1 hover-efecto" onclick="window.ModAuditoria.exportarExcel()" title="Exportar seleccionados a Excel">
+                            <i class="bi bi-file-earmark-excel-fill"></i> Excel
+                        </button>
+                        <button class="btn btn-dark fw-bold shadow-sm rounded-pill px-3 me-1 hover-efecto" onclick="window.ModAuditoria.exportarCSV()" title="Exportar seleccionados a CSV">
+                            <i class="bi bi-ubuntu"></i> CSV
+                        </button>
+                        <button class="btn btn-danger fw-bold shadow-sm rounded-pill px-3 hover-efecto" onclick="window.ModAuditoria.eliminarSeleccionados()" title="Eliminar registros de la página actual">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small">
+                            <tr>
+                                <th class="ps-4 text-center" style="width: 50px;">
+                                    <input class="form-check-input" type="checkbox" id="chk-todos-auditoria" onchange="window.ModAuditoria.toggleSeleccionarTodo(this.checked)" style="cursor: pointer;">
+                                </th>
+                                <th>Fecha y Hora</th>
+                                <th>Usuario (Cédula)</th>
+                                <th>Módulo</th>
+                                <th>Acción Realizada</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-auditoria"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-top p-3 d-flex justify-content-center rounded-bottom-4">
+                <nav><ul class="pagination mb-0" id="paginacion-auditoria"></ul></nav>
+            </div>
+        </div>
+    </div>
+</div>

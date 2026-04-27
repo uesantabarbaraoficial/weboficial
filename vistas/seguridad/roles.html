@@ -1,0 +1,81 @@
+<style>
+    /* ✨ ANIMACIÓN Y CRISTAL 3D ✨ */
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }
+    
+    .panel-vacio-moderno {
+        min-height: 500px;
+        border: 3px dashed #cbd5e1;
+        background-color: rgba(248, 250, 252, 0.6);
+        border-radius: 24px;
+        transition: all 0.3s ease;
+    }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #10B981 0%, #047857 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="burbuja-3d burbuja-3"></div>
+
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white mb-3 px-3 py-2 shadow-sm fw-bold" style="color: #10B981; letter-spacing: 1px; font-size: 0.85rem;"><i class="bi bi-shield-lock-fill me-1"></i> SEGURIDAD Y ACCESOS</span>
+                    <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Roles y Privilegios</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Controla a qué pantallas del sistema tiene acceso cada rol.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 animate__animated animate__fadeInUp align-items-start">
+    <div class="col-md-4 col-xl-3">
+        <div class="card border-0 shadow-sm rounded-4" style="border-top: 5px solid #10B981 !important;">
+            <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center rounded-top-4">
+                <h5 class="mb-0 fw-bold text-dark fs-6">Niveles de Acceso</h5>
+                <button class="btn btn-sm text-white fw-bold shadow-sm hover-efecto" style="background-color: #10B981;" onclick="window.ModRoles.crearRol()" title="Nuevo Rol"><i class="bi bi-plus-lg"></i></button>
+            </div>
+            <div class="card-body p-0" style="max-height: 600px; overflow-y: auto;">
+                <div class="list-group list-group-flush" id="lista-roles-ui">
+                    <div class="p-4 text-center text-muted"><div class="spinner-border spinner-border-sm" style="color: #10B981;" role="status"></div> Cargando...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 col-xl-9">
+        <div class="card border-0 shadow-sm rounded-4" id="panel-privilegios" style="display: none;">
+            <div class="card-header bg-white border-bottom p-4 rounded-top-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h4 class="mb-0 fw-bold text-dark" id="titulo-rol-seleccionado">Cargando...</h4>
+                        <small class="text-muted">Activa o desactiva los submódulos a los que este rol puede acceder.</small>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-danger btn-sm rounded-pill fw-bold px-3 shadow-sm" id="btn-eliminar-rol" onclick="window.ModRoles.eliminarRolActual()"><i class="bi bi-trash3-fill me-1"></i>Borrar Rol</button>
+                        <button class="btn text-white btn-sm fw-bold px-4 rounded-pill shadow-sm hover-efecto ms-2" style="background-color: #F59E0B;" onclick="window.ModRoles.guardarPrivilegios()"><i class="bi bi-floppy-fill me-2"></i>Guardar Privilegios</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-4 bg-light rounded-bottom-4">
+                <div id="contenedor-permisos-dinamicos"></div>
+            </div>
+        </div>
+        
+        <div id="panel-vacio-roles" class="panel-vacio-moderno d-flex flex-column align-items-center justify-content-center text-center animate__animated animate__fadeIn">
+            <div class="bg-white p-4 rounded-circle shadow-sm mb-4 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                <i class="bi bi-shield-lock-fill" style="font-size: 3.5rem; color: #cbd5e1;"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">Área de Privilegios</h4>
+            <p class="text-muted" style="max-width: 400px;">Seleccione un rol del panel lateral para configurar detalladamente sus accesos al sistema.</p>
+        </div>
+    </div>
+</div>

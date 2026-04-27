@@ -1,0 +1,71 @@
+<div id="qr-temp-verif" style="display:none;"></div>
+
+<style>
+    /* ✨ ESTILOS DE LAS BURBUJAS 3D ✨ */
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }
+    
+    /* ESTILOS DEL ESCANER */
+    #lector-qr-container { width: 100%; max-width: 400px; margin: 0 auto; border-radius: 15px; overflow: hidden; border: 3px solid #8B5CF6; display: none; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.2); position: relative; }
+    .btn-escaner { cursor: pointer; transition: all 0.3s; }
+    .btn-escaner:hover { background: #f3e8ff !important; }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="burbuja-3d burbuja-3"></div>
+
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white text-primary mb-3 px-3 py-2 shadow-sm fw-bold" style="color: #6D28D9 !important;"><i class="bi bi-shield-check me-1"></i> CONSULTA DE TRÁMITES</span>
+                    <h1 class="fw-bolder mb-2 text-white">Verificaciones</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.8);">Recupere comprobantes y consulte el estatus de las solicitudes.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center animate__animated animate__fadeInUp">
+    <div class="col-md-8 col-lg-6">
+        <div class="tarjeta-modulo bg-white p-4 p-md-5 shadow-sm text-center" style="border-radius: 24px;">
+            
+            <div class="bg-light p-4 rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                <i class="bi bi-file-earmark-pdf-fill text-danger fs-1"></i>
+            </div>
+            
+            <h4 class="fw-bold text-dark mb-2">Descargar Comprobante</h4>
+            <p class="text-muted small mb-4">Ingrese el <b>Código Único</b> que el sistema le asignó o <b>escanee el código QR</b> del documento impreso.</p>
+            
+            <div id="lector-qr-container" class="mb-4 bg-dark">
+                <div id="reader" width="100%"></div>
+                <button onclick="window.ModVerificaciones.detenerEscaner()" class="btn btn-danger btn-sm position-absolute bottom-0 start-50 translate-middle-x mb-2 shadow rounded-pill px-4" style="z-index:100;">
+                    <i class="bi bi-x-circle me-1"></i> Cancelar
+                </button>
+            </div>
+
+            <div id="input-busqueda-container">
+                <div class="input-group mb-4 shadow-sm" style="border-radius: 50px; overflow: hidden;">
+                    <button class="btn btn-escaner bg-white border-primary text-primary border-end-0 px-4" type="button" onclick="window.ModVerificaciones.iniciarEscaner()" style="border-color: #8B5CF6 !important; color: #8B5CF6 !important;" title="Escanear Código QR">
+                        <i class="bi bi-qr-code-scan fs-5"></i>
+                    </button>
+                    <input type="text" id="verif-codigo" class="form-control border-start-0 py-3 fs-5 fw-bold text-center text-dark" placeholder="ADM-000000" style="text-transform: uppercase; border-color: #8B5CF6 !important;" onkeypress="if(event.key === 'Enter') window.ModVerificaciones.buscarComprobante()">
+                    <button class="btn px-4 fw-bold text-white" style="background-color: #8B5CF6; border-color: #8B5CF6;" onclick="window.ModVerificaciones.buscarComprobante()">Buscar</button>
+                </div>
+            </div>
+            
+            <div id="verif-resultado" style="display: none;" class="mt-4 p-4 border rounded-4 bg-light text-start animate__animated animate__fadeIn">
+            </div>
+        </div>
+    </div>
+</div>

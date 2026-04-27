@@ -1,0 +1,103 @@
+<style>
+    @keyframes flotar-suave { 0% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.01); } 100% { transform: translateY(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0,0,0,0.05); backdrop-filter: blur(4px); pointer-events: none; z-index: 0; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 150px; height: 150px; bottom: -50px; left: -30px; animation: flotar-suave 6s infinite ease-in-out reverse; }
+</style>
+
+<div class="container-fluid p-0 animate__animated animate__fadeIn">
+    <div class="rounded-4 p-4 p-md-5 mb-4 position-relative overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #0066FF 0%, #003399 100%);">
+        <div class="burbuja-3d burbuja-1"></div>
+        <div class="burbuja-3d burbuja-2"></div>
+        
+        <div class="row align-items-center position-relative z-1">
+            <div class="col-md-auto text-center mb-3 mb-md-0">
+                <div class="bg-white p-1 rounded-circle shadow-lg d-inline-block">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style="width: 100px; height: 100px; background: #0066FF; font-size: 2.5rem;">
+                        <i class="bi bi-person-badge"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md text-center text-md-start text-white">
+                <h1 class="fw-bolder mb-1" id="perfil-nombre-display">Cargando...</h1>
+                <p class="mb-0 opacity-75 fw-bold"><i class="bi bi-person-vcard me-2"></i>C.I: <span id="perfil-cedula-display">---</span></p>
+                <div class="mt-2">
+                    <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-bold shadow-sm">
+                        <i class="bi bi-shield-check me-1"></i> <span id="perfil-rol-display">---</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-4 p-md-5">
+            <form id="form-mi-perfil">
+                <div class="row g-4">
+                    <div class="col-12"><h5 class="fw-bold text-dark border-bottom pb-2 mb-4">Información Personal</h5></div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted">Nombre Completo</label>
+                        <input type="text" id="perfil-nombre" class="input-moderno" required>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">Correo Electrónico</label>
+                        <input type="email" id="perfil-email" class="input-moderno">
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-muted">Teléfono</label>
+                        <input type="text" id="perfil-telefono" class="input-moderno">
+                    </div>
+
+                    <div class="col-12 mt-5"><h5 class="fw-bold text-dark border-bottom pb-2 mb-4 text-danger">Seguridad</h5></div>
+
+                    <div class="col-12 form-check form-switch mb-3 ps-5">
+                        <input class="form-check-input" type="checkbox" id="check-clave">
+                        <label class="form-check-label fw-bold" for="check-clave">Deseo cambiar mi contraseña</label>
+                    </div>
+
+                    <div class="row g-3" id="bloque-claves" style="display: none;">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">Clave Actual</label>
+                            <input type="password" id="perfil-clave-actual" class="input-moderno border-danger">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">Nueva Clave</label>
+                            <input type="password" id="perfil-clave-nueva" class="input-moderno border-success">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted">Confirmar Nueva</label>
+                            <input type="password" id="perfil-clave-confirmar" class="input-moderno border-success">
+                        </div>
+                    </div>
+
+                    <div class="col-12 form-check form-switch mb-3 ps-5 mt-4">
+                        <input class="form-check-input" type="checkbox" id="check-preguntas">
+                        <label class="form-check-label fw-bold" for="check-preguntas">Deseo actualizar mis preguntas de seguridad</label>
+                    </div>
+
+                    <div class="row g-3" id="bloque-preguntas" style="display: none;">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">Pregunta 1</label>
+                            <select id="perfil-preg1" class="input-moderno"></select>
+                            <input type="text" id="perfil-resp1" class="input-moderno mt-2" placeholder="Respuesta 1">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted">Pregunta 2</label>
+                            <select id="perfil-preg2" class="input-moderno"></select>
+                            <input type="text" id="perfil-resp2" class="input-moderno mt-2" placeholder="Respuesta 2">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-end border-top pt-4 mt-5">
+                    <button type="submit" class="btn btn-primary fw-bold px-5 rounded-pill shadow-sm">
+                        <i class="bi bi-floppy-fill me-2"></i>Guardar Perfil
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

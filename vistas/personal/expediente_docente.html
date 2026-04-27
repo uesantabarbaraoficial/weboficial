@@ -1,0 +1,309 @@
+<style>
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+
+    .wizard-container { position: relative; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; padding: 0 0.5rem; }
+    .wizard-line { position: absolute; top: 20px; left: 5%; right: 5%; height: 2px; background-color: #e2e8f0; z-index: 1; }
+    .wizard-step-wrapper { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 70px; }
+    .wizard-step { width: 40px; height: 40px; border-radius: 50%; background-color: white; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #94a3b8; transition: all 0.3s; margin-bottom: 8px; }
+    
+    .wizard-step-wrapper:hover .wizard-step { border-color: #0ea5e9; color: #0ea5e9; }
+    .wizard-step.activo { background-color: #0ea5e9; border-color: #0ea5e9; color: white; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2); }
+    .wizard-step.completado { background-color: white; border-color: #0ea5e9; color: #0ea5e9; }
+    
+    .wizard-label { font-size: 0.60rem; color: #64748b; font-weight: 600; text-align: center; transition: all 0.3s; line-height: 1.1; margin-top: 4px; }
+    .wizard-step-wrapper.activo .wizard-label { color: #0ea5e9; font-weight: 700; }
+    
+    .wizard-panel { display: none; animation: fadeIn 0.4s; }
+    .wizard-panel.activo { display: block; }
+    
+    .form-label { font-size: 0.85rem; font-weight: 700; color: #1e293b; margin-bottom: 0.3rem; }
+    .label-blue { color: #0ea5e9 !important; }
+    .seccion-titulo { background: #f0f9ff; padding: 10px 15px; border-left: 4px solid #0ea5e9; font-weight: bold; color: #0f172a; margin-bottom: 15px; border-radius: 0 8px 8px 0; }
+    
+    .caja-dinamica { border: 1px solid #cbd5e1; border-radius: 12px; padding: 15px; background: #f8fafc; position: relative; transition: all 0.2s; margin-bottom: 15px; }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown mt-2">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white text-primary mb-3 px-3 py-2 shadow-sm fw-bold" style="letter-spacing: 1px; font-size: 0.85rem;"><i class="bi bi-person-vcard me-1"></i> MI PERFIL CORPORATIVO</span>
+                    <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Mi Expediente</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Actualiza tus datos personales y corporativos.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Institución" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row animate__animated animate__fadeIn" id="fase-formulario" style="display: none;">
+    <div class="col-12 col-xl-10 mx-auto">
+        <div class="bg-white p-4 p-md-5 shadow-sm rounded-4 border-top border-5 position-relative" style="border-color: #0ea5e9;">
+
+            <div id="indicador-autoguardado" class="position-absolute d-none d-md-flex align-items-center bg-light border shadow-sm px-3 py-2 rounded-pill transition-all" style="top: 20px; right: 20px; z-index: 100; font-size: 0.75rem;">
+                <i class="bi bi-cloud-check text-secondary me-2 fs-6" id="icono-autoguardado"></i>
+                <span id="texto-autoguardado" class="text-secondary fw-bold">Sincronizado</span>
+            </div>
+
+            <div class="wizard-container mt-4 mt-md-0" id="wizard-docentes">
+                <div class="wizard-line"></div>
+                <div class="wizard-step-wrapper activo" id="ind-wrapper-1" onclick="window.ModExpedienteDocente.irAPaso(1)">
+                    <div class="wizard-step activo" id="ind-1">1</div><span class="wizard-label">Personal</span>
+                </div>
+                <div class="wizard-step-wrapper" id="ind-wrapper-2" onclick="window.ModExpedienteDocente.irAPaso(2)">
+                    <div class="wizard-step" id="ind-2"><i class="bi bi-house-heart-fill"></i></div><span class="wizard-label">Ayudas y<br>Créditos</span>
+                </div>
+                <div class="wizard-step-wrapper" id="ind-wrapper-3" onclick="window.ModExpedienteDocente.irAPaso(3)">
+                    <div class="wizard-step" id="ind-3">3</div><span class="wizard-label">Salud/Fam.</span>
+                </div>
+                <div class="wizard-step-wrapper" id="ind-wrapper-4" onclick="window.ModExpedienteDocente.irAPaso(4)">
+                    <div class="wizard-step" id="ind-4">4</div><span class="wizard-label">Corporativo</span>
+                </div>
+                <div class="wizard-step-wrapper" id="ind-wrapper-5" onclick="window.ModExpedienteDocente.irAPaso(5)">
+                    <div class="wizard-step" id="ind-5">5</div><span class="wizard-label">Currículum</span>
+                </div>
+                <div class="wizard-step-wrapper" id="ind-wrapper-6" onclick="window.ModExpedienteDocente.irAPaso(6)">
+                    <div class="wizard-step" id="ind-6">6</div><span class="wizard-label">Electoral</span>
+                </div>
+                <div class="wizard-step-wrapper" id="ind-wrapper-7" onclick="window.ModExpedienteDocente.irAPaso(7)">
+                    <div class="wizard-step" id="ind-7">7</div><span class="wizard-label">Formación</span>
+                </div>
+            </div>
+
+            <form id="form-expediente" onsubmit="event.preventDefault();">
+                
+                <div class="wizard-panel activo" id="paso-1">
+                    <h4 class="fw-bold mb-4 text-dark">I. Datos Básicos y Contacto</h4>
+                    <div class="row g-4">
+                        <div class="col-md-3"><label class="form-label label-blue">Cédula</label><input type="text" class="input-moderno bg-light fw-bold text-center" id="doc-cedula" readonly></div>
+                        <div class="col-md-9"><label class="form-label label-blue">Nombres y Apellidos</label><input type="text" class="input-moderno fw-bold txt-format" id="doc-nombres-apellidos"></div>
+                        
+                        <div class="col-md-4"><label class="form-label label-blue">Fecha de Nacimiento</label><input type="date" class="input-moderno" id="doc-fecha-nac"></div>
+                        <div class="col-md-2"><label class="form-label label-blue">Edad</label><input type="text" class="input-moderno bg-light fw-bold text-center text-primary" id="doc-edad" readonly placeholder="Se calcula"></div>
+                        <div class="col-md-3"><label class="form-label label-blue">Género</label><select class="input-moderno" id="doc-genero"><option value="">Seleccione...</option><option>Femenino</option><option>Masculino</option></select></div>
+                        <div class="col-md-3"><label class="form-label label-blue">Estado Civil</label><select class="input-moderno" id="doc-estado-civil"><option value="">Seleccione...</option><option>Soltero/a</option><option>Casado/a</option><option>Divorciado/a</option><option>Viudo/a</option><option>Concubino/a</option></select></div>
+                        
+                        <div class="col-12 mt-4"><div class="seccion-titulo">Geografía y Dirección</div></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Nacionalidad</label><select class="input-moderno" id="doc-nacionalidad"><option value="Venezolana">Venezolana</option><option value="Extranjera">Extranjera</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Estado</label><select class="input-moderno bg-light" id="doc-estado" disabled><option value="Monagas">Monagas</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Municipio</label><select class="input-moderno" id="doc-municipio" onchange="window.ModExpedienteDocente.cargarParroquiasUI()"><option value="">Cargando...</option></select></div>
+                        
+                        <div class="col-md-4"><label class="form-label label-blue">Parroquia</label><select class="input-moderno" id="doc-parroquia" disabled><option value="">Municipio primero...</option></select></div>
+                        <div class="col-md-8 position-relative">
+                            <label class="form-label label-blue">Dirección Exacta</label>
+                            <input type="text" class="input-moderno txt-format" id="doc-direccion" placeholder="Ej: Urbanización, Avenida..." oninput="window.ModExpedienteDocente.buscarDireccionWeb(this.value)">
+                            <ul id="lista-dir-doc" class="list-group position-absolute w-100 shadow-lg d-none animate__animated animate__fadeInIn" style="z-index: 1000; max-height: 200px; overflow-y: auto; top: 100%;"></ul>
+                        </div>
+                        
+                        <div class="col-12 mt-4"><div class="seccion-titulo">Información de Contacto</div></div>
+                        <div class="col-md-3"><label class="form-label label-blue">Teléfono Móvil</label><input type="text" class="input-moderno" id="doc-tel-movil" oninput="this.value = this.value.replace(/\D/g, '')"></div>
+                        <div class="col-md-3"><label class="form-label label-blue">Tel. Local/Fijo</label><input type="text" class="input-moderno" id="doc-tel-local" oninput="this.value = this.value.replace(/\D/g, '')"></div>
+                        <div class="col-md-3"><label class="form-label label-blue">Correo Personal</label><input type="email" class="input-moderno" id="doc-correo-per"></div>
+                        <div class="col-md-3"><label class="form-label label-blue">Correo Institucional</label><input type="email" class="input-moderno" id="doc-correo-inst"></div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-2">
+                    <h4 class="fw-bold mb-4 text-dark">II. Ayudas y Créditos (Situación Habitacional)</h4>
+                    
+                    <div class="seccion-titulo"><i class="bi bi-house-exclamation-fill me-2 text-primary"></i>Estudio de Habitabilidad</div>
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-3"><label class="form-label label-blue">Tipo Inmueble</label><select class="input-moderno" id="doc-viv-tipo"><option value="">Seleccione...</option><option value="Casa">Casa / Quinta</option><option value="Apartamento">Apartamento</option><option value="Townhouse">Townhouse</option><option value="Anexo">Anexo</option><option value="Habitación">Habitación</option><option value="Rancho">Rancho</option><option value="Otro">Otro</option></select></div>
+                        
+                        <div class="col-md-9">
+                            <label class="form-label label-blue">Condición Actual de Habitabilidad</label>
+                            <select class="input-moderno fw-bold" id="doc-viv-condicion" onchange="window.ModExpedienteDocente.toggleVivienda(this)">
+                                <option value="">Seleccione la condición exacta...</option>
+                                <option value="1) Habita en condición de hacinamiento, solo o con su grupo familiar.">1) Habita en condición de hacinamiento, solo o con su grupo familiar.</option>
+                                <option value="2) Habita en condición de arrimado, solo o con su grupo familiar.">2) Habita en condición de arrimado, solo o con su grupo familiar.</option>
+                                <option value="3) Habita en condición de alquiler, solo o con su grupo familiar.">3) Habita en condición de alquiler, solo o con su grupo familiar.</option>
+                                <option value="4) Habita en condición de alquiler, con solicitud u orden de desalojo.">4) Habita en condición de alquiler, con solicitud u orden de desalojo.</option>
+                                <option value="5) Habita en vivienda catalogada de alto riesgo, así declarado por la autoridad competente (Protección Civil o Bomberos)">5) Habita en vivienda catalogada de alto riesgo (Avalado por PC/Bomberos).</option>
+                                <option value="6) Habita en vivienda prestada, bajo su cuidado.">6) Habita en vivienda prestada, bajo su cuidado.</option>
+                                <option value="7) Habita en un inmueble asignado, propiedad de la Empresa.">7) Habita en un inmueble asignado, propiedad de la Empresa.</option>
+                                <option value="8) Habita un inmueble bajo otra condición diferente a las anteriores">8) Habita un inmueble bajo otra condición diferente a las anteriores.</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-12" id="contenedor-viv-detalle" style="display: none;"><label class="form-label label-blue">Especifique "Otra condición":</label><input type="text" class="input-moderno txt-format" id="doc-viv-detalle"></div>
+                    </div>
+
+                    <div class="seccion-titulo bg-warning bg-opacity-10 border-warning text-dark"><i class="bi bi-bank me-2 text-warning"></i>Solicitud / Beneficios Crediticios</div>
+                    <div class="row g-4">
+                        
+                        <div class="col-md-6">
+                            <div class="p-4 border rounded-3 bg-light h-100">
+                                <label class="form-label text-dark fw-bold mb-2"><i class="bi bi-house-add-fill text-success me-2"></i>Tipo de Solicitud de Vivienda</label>
+                                <select class="input-moderno mb-3 border-success" id="cred-solicitud-tipo" onchange="window.ModExpedienteDocente.toggleSolicitudUnica(this)">
+                                    <option value="">Ninguna / No aplica</option>
+                                    <option value="Inicial/Adquisición">Inicial / Adquisición</option>
+                                    <option value="Inicial/Mejoras">Inicial / Mejoras</option>
+                                    <option value="Adicional/Adquisición">Adicional / Adquisición</option>
+                                    <option value="Adicional/Mejoras">Adicional / Mejoras</option>
+                                </select>
+                                
+                                <label class="form-label text-dark fw-bold mb-2">Estado Actual de la Solicitud</label>
+                                <select class="input-moderno bg-white fw-bold text-secondary" id="cred-solicitud-est" disabled>
+                                    <option value="">Seleccione el estado...</option>
+                                    <option value="Solicitado (En Espera)">Solicitado (En Espera)</option>
+                                    <option value="Pagando">Lo estoy pagando (Activo)</option>
+                                    <option value="Pagado">Ya está pagado/cancelado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="p-4 border rounded-3 bg-light h-100">
+                                <label class="form-label text-dark fw-bold mb-2"><i class="bi bi-cash-stack text-primary me-2"></i>Crédito de 5 Sueldos</label>
+                                <p class="small text-muted mb-2">Indique si goza o ha solicitado este beneficio crediticio.</p>
+                                <select class="input-moderno bg-white fw-bold border-primary mt-2" id="cred-5-sueldos-est">
+                                    <option value="No Solicitado">No Solicitado / No Aplica</option>
+                                    <option value="Solicitado (En Espera)">Solicitado (En Espera)</option>
+                                    <option value="Pagando">Lo estoy pagando (Activo)</option>
+                                    <option value="Pagado">Ya está pagado/cancelado</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-3">
+                    <h4 class="fw-bold mb-4 text-dark">III. Salud, Tallas y Carga Familiar</h4>
+                    
+                    <div class="seccion-titulo bg-info bg-opacity-10 border-info text-dark"><i class="bi bi-universal-access me-2 text-info"></i>Tallas y Dotación</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4"><label class="form-label label-blue">Talla Camisa</label><select class="input-moderno" id="doc-talla-camisa"><option value="">Sel...</option><option>SS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>XXXL</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Talla Chemise</label><select class="input-moderno" id="doc-talla-chemise"><option value="">Sel...</option><option>SS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option><option>XXXL</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Talla Braga</label><select class="input-moderno" id="doc-talla-braga"><option value="">Sel...</option><option>36</option><option>38</option><option>40</option><option>42</option><option>44</option><option>46</option><option>48</option><option>50</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Talla Pantalón</label><select class="input-moderno" id="doc-talla-pantalon"><option value="">Sel...</option><option>28</option><option>30</option><option>32</option><option>34</option><option>36</option><option>38</option><option>40</option><option>42</option><option>44</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Talla Zapatos</label><select class="input-moderno" id="doc-talla-calzado"><option value="">Sel...</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option><option>41</option><option>42</option><option>43</option><option>44</option><option>45</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Talla Botas</label><select class="input-moderno" id="doc-talla-botas"><option value="">Sel...</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option><option>41</option><option>42</option><option>43</option><option>44</option><option>45</option></select></div>
+                    </div>
+
+                    <div class="seccion-titulo bg-danger bg-opacity-10 border-danger text-dark"><i class="bi bi-heart-pulse-fill me-2 text-danger"></i>Información Médica y Discapacidad</div>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-2"><label class="form-label label-blue">G. Sanguíneo</label><select class="input-moderno" id="doc-sangre"><option value="">Sel...</option><option>O+</option><option>O-</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option></select></div>
+                        <div class="col-md-5"><label class="form-label label-blue">Alergias o Condiciones</label><input type="text" class="input-moderno txt-format" id="doc-condicion-medica" placeholder="Ninguna u Especifique..."></div>
+                        
+                        <div class="col-md-3"><label class="form-label label-blue">Su Cond. Neurológica</label><select class="input-moderno fw-bold text-primary" id="doc-neuro" onchange="window.ModExpedienteDocente.cambioNeuroTrabajador(this)"><option value="Neurotípico">Neurotípico</option><option value="Neurodivergente">Neurodivergente</option></select></div>
+                        <div class="col-md-2" id="div-doc-conapdis" style="display: none;"><label class="form-label text-danger fw-bold">Cert. CONAPDIS</label><select class="input-moderno fw-bold text-danger border-danger bg-danger bg-opacity-10" id="doc-conapdis"><option value="No">No posee</option><option value="Sí">Sí posee</option></select></div>
+                        
+                        <div class="col-md-6 mt-4"><label class="form-label label-blue">En caso de emergencia avisar a:</label><input type="text" class="input-moderno txt-format" id="doc-emergencia-nombre"></div>
+                        <div class="col-md-6 mt-4"><label class="form-label label-blue">Teléfono de emergencia:</label><input type="text" class="input-moderno" id="doc-emergencia-tel" oninput="this.value = this.value.replace(/\D/g, '')"></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="seccion-titulo bg-primary bg-opacity-10 border-primary text-dark mb-0 flex-grow-1 me-3"><i class="bi bi-people-fill me-2 text-primary"></i>Declaración de Carga Familiar</div>
+                        <button type="button" class="btn btn-sm btn-outline-primary fw-bold rounded-pill text-nowrap shadow-sm" onclick="window.ModExpedienteDocente.agregarFamiliar()"><i class="bi bi-person-plus-fill me-1"></i> Agregar Familiar</button>
+                    </div>
+                    <div class="alert alert-info py-2 small mb-3"><i class="bi bi-info-circle me-2"></i><strong>Importante:</strong> Registre aquí los familiares directos. Indique si conviven bajo el mismo techo.</div>
+                    <div id="contenedor-familiares-dinamicos"></div>
+                    <p id="msg-sin-familiares" class="text-center text-muted small mt-3 fw-bold">No ha registrado carga familiar.</p>
+                </div>
+
+                <div class="wizard-panel" id="paso-4">
+                    <h4 class="fw-bold mb-4 text-dark">IV. Perfil Corporativo</h4>
+                    
+                    <div class="alert alert-warning small fw-bold mb-4 shadow-sm border-warning">
+                        <i class="bi bi-lock-fill me-2 fs-5"></i> El Historial Interno y el Desarrollo de Carrera son de uso y modificación exclusiva del departamento de RRHH.
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4"><label class="form-label label-blue">Fecha de Ingreso</label><input type="date" class="input-moderno bg-light text-muted" id="doc-fecha-ingreso" readonly></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Años de Servicio</label><input type="text" class="input-moderno bg-light fw-bold text-primary" id="doc-anios-servicio" readonly></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Grupo Salarial</label><input type="text" class="input-moderno bg-light text-muted" id="doc-grupo-salarial" readonly></div>
+                        
+                        <div class="col-md-4"><label class="form-label label-blue">Posición Actual (Cargo)</label><input type="text" class="input-moderno txt-format bg-light text-muted" id="doc-posicion-actual" readonly></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Gerencia / Departamento</label><input type="text" class="input-moderno txt-format bg-light text-muted" id="doc-gerencia" readonly></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Organización / Proceso</label><input type="text" class="input-moderno txt-format bg-light text-muted" id="doc-organizacion" readonly></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3 mt-4 border-top pt-4">
+                        <div class="seccion-titulo bg-warning bg-opacity-10 border-warning text-dark mb-0 flex-grow-1"><i class="bi bi-clock-history me-2 text-warning"></i>Histórico de Posiciones Internas (Solo Lectura)</div>
+                    </div>
+                    <div id="contenedor-posiciones-dinamicos"></div>
+                    <p id="msg-sin-posiciones" class="text-center text-muted small mt-3 fw-bold">No hay histórico de posiciones registrado.</p>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3 mt-4 border-top pt-4">
+                        <div class="seccion-titulo bg-success bg-opacity-10 border-success text-dark mb-0 flex-grow-1"><i class="bi bi-briefcase me-2 text-success"></i>Experiencia Laboral Externa (Solo Lectura)</div>
+                    </div>
+                    <div id="contenedor-experiencias-dinamicos"></div>
+                    <p id="msg-sin-experiencias" class="text-center text-muted small mt-3 fw-bold">No hay experiencia laboral externa registrada.</p>
+
+                    <div class="row g-4 mt-2">
+                        <div class="col-md-6 pt-3 border-top">
+                            <label class="form-label label-blue"><i class="bi bi-graph-up-arrow me-2"></i>V. Desarrollo de Carrera</label>
+                            <textarea class="input-moderno txt-format bg-light text-muted" id="doc-desarrollo" rows="3" placeholder="Información administrada por RRHH..." readonly></textarea>
+                        </div>
+                        <div class="col-md-6 pt-3 border-top">
+                            <label class="form-label label-blue"><i class="bi bi-card-text me-2"></i>VI. Observaciones</label>
+                            <textarea class="input-moderno txt-format bg-light text-muted" id="doc-observaciones" rows="3" placeholder="Observaciones exclusivas de RRHH..." readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-5">
+                    <h4 class="fw-bold mb-4 text-dark">V. Formación Profesional</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="seccion-titulo mb-0 flex-grow-1 me-3">Títulos Universitarios / Postgrados</div>
+                        <button type="button" class="btn btn-sm btn-outline-primary fw-bold rounded-pill text-nowrap shadow-sm" onclick="window.ModExpedienteDocente.agregarTitulo()"><i class="bi bi-plus-lg me-1"></i> Añadir Título</button>
+                    </div>
+                    <div id="contenedor-titulos-dinamicos"></div>
+                    <p id="msg-sin-titulos" class="text-center text-muted small mt-3 fw-bold">No ha registrado títulos universitarios.</p>
+                    
+                    <div class="col-12 mt-4 pt-3 border-top">
+                        <label class="form-label label-blue"><i class="bi bi-translate me-2"></i>Otros Idiomas</label>
+                        <input type="text" class="input-moderno txt-format" id="doc-idiomas" placeholder="Ej: Inglés (Avanzado), Portugués (Básico)...">
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-3 mt-5 border-top pt-4">
+                        <div class="seccion-titulo mb-0 flex-grow-1 me-3">Cursos, Talleres y Diplomados Realizados</div>
+                        <button type="button" class="btn btn-sm btn-outline-primary fw-bold rounded-pill text-nowrap shadow-sm" onclick="window.ModExpedienteDocente.agregarCurso()"><i class="bi bi-plus-lg me-1"></i> Añadir Curso</button>
+                    </div>
+                    <div id="contenedor-cursos-dinamicos"></div>
+                    <p id="msg-sin-cursos" class="text-center text-muted small mt-3 fw-bold">No ha agregado ningún curso adicional.</p>
+                </div>
+
+                <div class="wizard-panel" id="paso-6">
+                    <h4 class="fw-bold mb-4 text-dark">VI. Información Electoral</h4>
+                    <div class="row g-4">
+                        <div class="col-md-4"><label class="form-label label-blue">Estado</label><select class="input-moderno bg-light" id="doc-electoral-estado" disabled><option value="Monagas">Monagas</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Municipio</label><select class="input-moderno" id="doc-electoral-municipio" onchange="window.ModExpedienteDocente.cargarParroquiasElectoralUI()"><option value="">Cargando...</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-blue">Parroquia</label><select class="input-moderno" id="doc-electoral-parroquia" disabled><option value="">Municipio primero...</option></select></div>
+                        <div class="col-12"><label class="form-label label-blue">Centro de Votación Exacto</label><input type="text" class="input-moderno txt-format" id="doc-electoral-centro"></div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-7">
+                    <h4 class="fw-bold mb-4 text-dark">VII. Plan de Formación Institucional</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="seccion-titulo bg-primary bg-opacity-10 border-primary text-dark mb-0 flex-grow-1 me-3"><i class="bi bi-journal-bookmark-fill me-2 text-primary"></i>Selección de Formaciones Deseadas</div>
+                        <button type="button" class="btn btn-sm btn-outline-primary fw-bold rounded-pill text-nowrap shadow-sm" onclick="window.ModExpedienteDocente.agregarFormacion()"><i class="bi bi-plus-lg me-1"></i> Añadir Formación</button>
+                    </div>
+                    <div id="contenedor-formaciones-dinamicos"></div>
+                    <p id="msg-sin-formaciones" class="text-center text-muted small mt-3 fw-bold">No hay formaciones seleccionadas.</p>
+                    <div class="col-12 mt-4 pt-3 border-top">
+                        <label class="form-label label-blue">Otras sugerencias de formación o necesidades:</label>
+                        <textarea class="input-moderno txt-format" id="plan-necesidades-extra" rows="2"></textarea>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-5 pt-4 border-top">
+                    <button type="button" class="btn btn-light border fw-bold text-muted px-4 shadow-sm hover-efecto" id="btn-prev" onclick="window.ModExpedienteDocente.cambiarPaso(-1)" style="display: none;"><i class="bi bi-arrow-left me-2"></i> Atrás</button>
+                    <button type="button" class="btn fw-bold px-5 shadow-sm hover-efecto ms-auto text-white" style="background: #0ea5e9; border-color: #0ea5e9;" id="btn-next" onclick="window.ModExpedienteDocente.cambiarPaso(1)">Siguiente <i class="bi bi-arrow-right ms-2"></i></button>
+                    <button type="button" class="btn btn-success fw-bold px-5 shadow-sm hover-efecto ms-auto" id="btn-save" onclick="window.ModExpedienteDocente.guardarExpediente()" style="display: none;"><i class="bi bi-cloud-arrow-up-fill me-2"></i> Finalizar Expediente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

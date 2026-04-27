@@ -1,0 +1,69 @@
+<style>
+    /* ✨ BURBUJAS 3D Y EFECTOS ✨ */
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #10B981 0%, #047857 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white text-success mb-3 px-3 py-2 shadow-sm fw-bold" style="letter-spacing: 1px; font-size: 0.85rem;"><i class="bi bi-person-workspace me-1"></i> GESTIÓN DOCENTE</span>
+                    <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Asignar Guiaturas</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Administración del personal docente por sección.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row animate__animated animate__fadeInUp">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4" style="border-top: 5px solid #10B981 !important;">
+            
+            <div class="card-header bg-white border-bottom p-4 rounded-top-4">
+                <div class="row align-items-center g-3">
+                    <div class="col-md-5">
+                        <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-person-video3 text-success me-2"></i>Asignación de Guías</h5>
+                        <small class="text-muted">Gestione el cuerpo docente de cada ambiente.</small>
+                    </div>
+                    <div class="col-md-7 d-flex justify-content-md-end align-items-center flex-wrap gap-3">
+                        <div class="input-group input-group-sm shadow-sm" style="width: auto;">
+                            <span class="input-group-text bg-light border-success"><i class="bi bi-funnel"></i></span>
+                            <select id="filtro-nivel-guiatura" class="form-select border-success fw-bold text-dark" style="min-width: 180px;" onchange="window.ModGuiaturas.aplicarFiltros()">
+                                <option value="TODOS">Todos los Niveles</option>
+                            </select>
+                        </div>
+                        <span class="badge bg-success rounded-pill px-3 py-2 shadow-sm fs-6" id="contador-salones">0 Salones</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body p-0">
+                <div class="table-responsive" style="min-height: 400px;">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small">
+                            <tr>
+                                <th class="ps-4" style="width: 25%">Salón / Estatus</th>
+                                <th style="width: 30%">Docente Guía Principal</th>
+                                <th style="width: 30%">Docente Auxiliar <br><small class="fw-normal text-muted">(Solo Educación Inicial)</small></th>
+                                <th class="text-end pe-4" style="width: 15%">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-guiaturas">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,79 @@
+<style>
+    /* ✨ ANIMACIÓN Y CRISTAL 3D ✨ */
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #4F46E5 0%, #312E81 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="burbuja-3d burbuja-3"></div>
+
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white text-primary mb-3 px-3 py-2 shadow-sm fw-bold" style="letter-spacing: 1px; font-size: 0.85rem;"><i class="bi bi-sliders me-1"></i> DIRECCIÓN Y SISTEMA</span>
+                    <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Configuración Global</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.8);">Parámetros, años escolares y fases académicas del sistema.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 animate__animated animate__fadeIn">
+    
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100" style="border-top: 5px solid #4F46E5 !important;">
+            <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center rounded-top-4">
+                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-calendar-event-fill me-2" style="color: #4F46E5;"></i>Años Escolares</h5>
+                <button class="btn btn-sm text-white fw-bold shadow-sm" style="background: #4F46E5;" onclick="window.ModConfiguracion.nuevoParametro('Periodo_Escolar')">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="lista-periodos">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100" style="border-top: 5px solid #06B6D4 !important;">
+            <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center rounded-top-4">
+                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-clock-history me-2" style="color: #06B6D4;"></i>Fases Académicas</h5>
+                <button class="btn btn-sm text-white fw-bold shadow-sm" style="background: #06B6D4;" onclick="window.ModConfiguracion.nuevoParametro('Fase_Escolar')">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="lista-lapsos">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 h-100" style="border-top: 5px solid #10B981 !important;">
+            <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center rounded-top-4">
+                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-mortarboard-fill me-2" style="color: #10B981;"></i>Niveles Educativos</h5>
+                <button class="btn btn-sm text-white fw-bold shadow-sm" style="background: #10B981;" onclick="window.ModConfiguracion.nuevoParametro('Nivel_Educativo', false)">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="lista-niveles">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

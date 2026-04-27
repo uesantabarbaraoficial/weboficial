@@ -1,0 +1,24 @@
+{
+  "name": "SIGAE",
+  "short_name": "SIGAE",
+  "description": "Sistema Integral de Gestión y Administración Escolar de la UE Santa Bárbara",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f4f7fe",
+  "theme_color": "#0066FF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/img/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/img/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

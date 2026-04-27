@@ -1,0 +1,108 @@
+<style>
+    /* ✨ ESFERAS DE CRISTAL 3D ✨ */
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }
+
+    /* CSS PAGINACIÓN */
+    .page-link { color: #087990; border: none; border-radius: 8px; margin: 0 3px; font-weight: bold; transition: all 0.2s; cursor: pointer; }
+    .page-item.active .page-link { background-color: #087990; color: white; box-shadow: 0 4px 10px rgba(8, 121, 144, 0.3); }
+    .page-link:hover:not(.active) { background-color: rgba(8, 121, 144, 0.1); color: #087990; }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #0dcaf0 0%, #087990 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="burbuja-3d burbuja-3"></div>
+            
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white mb-3 px-3 py-2 shadow-sm fw-bold" style="color: #087990; letter-spacing: 1px;"><i class="bi bi-door-open me-1"></i> DIRECCIÓN Y SISTEMA</span>
+                    <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Espacios y Ambientes</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Gestión de infraestructura y capacidad instalada.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 animate__animated animate__fadeInUp">
+    <div class="col-12 col-xl-4" id="columna-formulario-espacios">
+        <div class="card p-4 bg-white shadow-sm border-0 h-100" style="border-top: 5px solid #0dcaf0 !important; border-radius: 20px;">
+            <h5 class="fw-bold text-dark mb-4 border-bottom pb-3"><i class="bi bi-plus-square-fill text-info me-2"></i><span id="titulo-form">Registrar Espacio</span></h5>
+            
+            <div class="row g-3">
+                <div class="col-12">
+                    <label class="fw-bold text-muted small mb-2">Nombre o Identificador <span class="text-danger">*</span></label>
+                    <input type="text" id="esp-nombre" class="input-moderno fw-bold border-info" placeholder="Ej: Aula 1er Grado A">
+                </div>
+                
+                <div class="col-12">
+                    <label class="fw-bold text-muted small mb-2">Tipo de Ambiente <span class="text-danger">*</span></label>
+                    <select id="esp-tipo" class="form-select input-moderno bg-light fw-bold text-dark border-info">
+                        <option value="">Seleccione...</option>
+                        <option value="Aula Clásica">Aula Clásica</option>
+                        <option value="Laboratorio">Laboratorio Especializado</option>
+                        <option value="Cancha / Área Deportiva">Cancha / Área Deportiva</option>
+                        <option value="Auditorio / Usos Múltiples">Auditorio / Usos Múltiples</option>
+                        <option value="Oficina Administrativa">Oficina Administrativa</option>
+                        <option value="Baños">Baños</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label class="fw-bold text-muted small mb-2">Capacidad (Personas)</label>
+                    <input type="number" id="esp-capacidad" class="input-moderno border-info" placeholder="Ej: 35">
+                </div>
+                
+                <div class="col-12 pt-3">
+                    <button class="btn btn-info text-white px-4 shadow-sm fw-bold w-100 mb-2 hover-efecto rounded-pill" id="btn-guardar-espacio" onclick="window.ModEspacios.guardarEspacio()">
+                        <i class="bi bi-save-fill me-2"></i>Guardar Espacio
+                    </button>
+                    <button class="btn btn-light border text-danger fw-bold w-100 d-none rounded-pill hover-efecto" id="btn-cancelar-edicion" onclick="window.ModEspacios.cancelarEdicion()">
+                        Cancelar Edición
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-xl-8" id="columna-tabla-espacios">
+        <div class="card bg-white shadow-sm border-0 h-100" style="border-top: 5px solid #087990 !important; border-radius: 20px;">
+            <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center flex-wrap gap-3" style="border-radius: 20px 20px 0 0;">
+                <h5 class="fw-bold text-dark m-0"><i class="bi bi-list-columns-reverse text-info me-2"></i>Directorio de Ambientes</h5>
+                <input type="text" id="buscador-espacios" class="input-moderno form-control-sm border-info" placeholder="Buscar espacio o tipo..." style="width: 250px;" onkeyup="window.ModEspacios.filtrar()">
+            </div>
+            
+            <div class="card-body p-0">
+                <div class="table-responsive border-bottom-0 rounded-bottom-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small">
+                            <tr>
+                                <th class="ps-4 py-3" style="width: 25%;">Tipo</th>
+                                <th class="py-3">Nombre / Identificador</th>
+                                <th class="py-3 text-center" style="width: 15%;">Capacidad</th>
+                                <th class="py-3 text-end pe-4" style="width: 15%;">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-espacios">
+                            <tr><td colspan="4" class="text-center py-5 text-muted">Cargando datos desde Supabase...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-white border-top p-3 d-flex justify-content-center" style="border-radius: 0 0 20px 20px;">
+                <nav><ul class="pagination mb-0" id="paginacion-espacios"></ul></nav>
+            </div>
+        </div>
+    </div>
+</div>

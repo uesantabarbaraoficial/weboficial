@@ -1,0 +1,79 @@
+<style>
+    /* BANNER ANIMADO VIVO */
+    .banner-interactivo { background: linear-gradient(135deg, #0066FF 0%, #003399 100%); border-radius: 24px; position: relative; overflow: hidden; box-shadow: 0 15px 35px rgba(0, 102, 255, 0.2); }
+    .fecha-vivo { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 50rem; padding: 8px 20px; display: inline-flex; align-items: center; gap: 10px; }
+    .insignia-oficial { background: rgba(0, 0, 0, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; padding: 5px 12px; font-size: 0.85rem; color: white; font-weight: 600; letter-spacing: 0.5px; }
+
+    /* MOTOR DE TARJETAS 3D (FLIP CARDS) */
+    .escena-3d { perspective: 1000px; height: 320px; }
+    .tarjeta-flip { width: 100%; height: 100%; position: relative; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; cursor: pointer; }
+    .escena-3d:hover .tarjeta-flip { transform: rotateY(180deg); }
+    .cara-frontal, .cara-trasera { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 24px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+    .cara-frontal { background: #ffffff; border: 1px solid rgba(0,0,0,0.05); }
+    .cara-trasera { background: #ffffff; transform: rotateY(180deg); text-align: justify; }
+    .icono-flotante { font-size: 4rem; margin-bottom: 0.5rem; transition: transform 0.3s ease; }
+    .escena-3d:hover .icono-flotante { transform: scale(1.1) translateY(-10px); }
+    .etiqueta-tocar { margin-top: auto; background: rgba(255,255,255,0.6); color: #64748b; padding: 5px 15px; border-radius: 50rem; font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 5px; animation: latido 2s infinite; border: 1px solid rgba(0,0,0,0.05); }
+    @keyframes latido { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    .texto-trasero { overflow-y: auto; max-height: 100%; width: 100%; padding-right: 5px; color: #334155; font-size: 0.9rem; line-height: 1.6; text-align: center; }
+
+    /* CTA ORGANIGRAMA */
+    .banner-organigrama { background: white; border-radius: 20px; transition: all 0.3s ease; border: 1px solid #ddd6fe; border-left: 6px solid #8b5cf6; cursor: pointer; }
+    .banner-organigrama:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(139, 92, 246, 0.15); border-color: #8b5cf6; }
+
+    @media (max-width: 768px) { .escena-3d { height: 280px; } .banner-interactivo { padding: 2rem 1.5rem !important; } .titulo-bienvenida { font-size: 2rem !important; } }
+</style>
+
+<div class="container-fluid px-0">
+    
+    <div class="row mb-4 animate__animated animate__fadeInDown">
+        <div class="col-12">
+            <div class="banner-interactivo p-4 p-md-5 text-white">
+                <div class="burbuja-3d burbuja-1"></div><div class="burbuja-3d burbuja-2"></div><div class="burbuja-3d burbuja-3"></div>
+                
+                <div class="row align-items-center position-relative z-1">
+                    <div class="col-md-9 text-center text-md-start mb-4 mb-md-0">
+                        <div class="fecha-vivo mb-3 shadow-sm animate__animated animate__fadeIn" style="animation-delay: 0.5s;">
+                            <i class="bi bi-clock-history fs-5"></i>
+                            <span id="reloj-vivo" class="fw-bold" style="letter-spacing: 1px;">Cargando fecha...</span>
+                        </div>
+                        <h1 class="fw-bolder text-white titulo-bienvenida mb-1" id="lbl-saludo-usuario" style="font-size: 2.8rem;">¡Bienvenido!</h1>
+                        <p class="text-white fw-bold fs-4 mb-2" id="lbl-info-escuela" style="text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Unidad Educativa Libertador Bolívar</p>
+                        
+                        <p class="text-white-50 small fw-bold mb-4 d-flex align-items-center justify-content-center justify-content-md-start">
+                            <i class="bi bi-geo-alt-fill text-danger me-2 fs-5"></i> 
+                            <span id="lbl-direccion-escuela">Cargando dirección institucional...</span>
+                        </p>
+
+                        <div class="d-flex gap-2 flex-wrap justify-content-center justify-content-md-start">
+                            <div class="insignia-oficial shadow-sm"><i class="bi bi-upc-scan text-info me-1"></i> DEA: <span id="lbl-dea-escuela">...</span></div>
+                            <div class="insignia-oficial shadow-sm"><i class="bi bi-hash text-warning me-1"></i> RIF: <span id="lbl-rif-escuela">...</span></div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                        <img src="assets/img/logo.png" alt="Logo de la Escuela" class="img-fluid" style="max-height: 140px; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.3));">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+        <div class="col-12 col-md-6 col-xl-3"><div class="escena-3d"><div class="tarjeta-flip"><div class="cara-frontal" style="background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%); border: 1px solid #bfdbfe;"><div class="text-primary icono-flotante"><i class="bi bi-bullseye"></i></div><h4 class="fw-bold text-primary mb-0">Misión</h4><div class="etiqueta-tocar mt-4"><i class="bi bi-arrow-repeat text-primary"></i> Voltear tarjeta</div></div><div class="cara-trasera" style="border: 2px solid #0066FF;"><h6 class="fw-bold text-primary border-bottom pb-2 mb-3 w-100 text-center"><i class="bi bi-bullseye me-2"></i>Nuestra Misión</h6><div class="texto-trasero" id="lbl-mision-back"><span class="placeholder col-12"></span><span class="placeholder col-8"></span></div></div></div></div></div>
+        <div class="col-12 col-md-6 col-xl-3"><div class="escena-3d"><div class="tarjeta-flip" style="transition-delay: 0.1s;"><div class="cara-frontal" style="background: linear-gradient(135deg, #ffffff 0%, #ecfeff 100%); border: 1px solid #a5f3fc;"><div class="text-info icono-flotante"><i class="bi bi-eye-fill"></i></div><h4 class="fw-bold text-info mb-0">Visión</h4><div class="etiqueta-tocar mt-4"><i class="bi bi-arrow-repeat text-info"></i> Voltear tarjeta</div></div><div class="cara-trasera" style="border: 2px solid #0dcaf0;"><h6 class="fw-bold text-info border-bottom pb-2 mb-3 w-100 text-center"><i class="bi bi-eye-fill me-2"></i>Nuestra Visión</h6><div class="texto-trasero" id="lbl-vision-back"><span class="placeholder col-12"></span><span class="placeholder col-8"></span></div></div></div></div></div>
+        <div class="col-12 col-md-6 col-xl-3"><div class="escena-3d"><div class="tarjeta-flip" style="transition-delay: 0.2s;"><div class="cara-frontal" style="background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%); border: 1px solid #bbf7d0;"><div class="text-success icono-flotante"><i class="bi bi-gem"></i></div><h4 class="fw-bold text-success mb-0">Valores</h4><div class="etiqueta-tocar mt-4"><i class="bi bi-arrow-repeat text-success"></i> Voltear tarjeta</div></div><div class="cara-trasera" style="border: 2px solid #198754;"><h6 class="fw-bold text-success border-bottom pb-2 mb-3 w-100 text-center"><i class="bi bi-gem me-2"></i>Objetivo / Valores</h6><div class="texto-trasero" id="lbl-objetivo-back"><span class="placeholder col-12"></span><span class="placeholder col-8"></span></div></div></div></div></div>
+        <div class="col-12 col-md-6 col-xl-3"><div class="escena-3d"><div class="tarjeta-flip" style="transition-delay: 0.3s;"><div class="cara-frontal" style="background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%); border: 1px solid #fde68a;"><div class="text-warning icono-flotante"><i class="bi bi-journal-bookmark-fill"></i></div><h4 class="fw-bold text-warning mb-0" style="color: #d97706 !important;">PEIC</h4><div class="etiqueta-tocar mt-4"><i class="bi bi-arrow-repeat text-warning"></i> Voltear tarjeta</div></div><div class="cara-trasera" style="border: 2px solid #ffc107;"><h6 class="fw-bold text-warning border-bottom pb-2 mb-3 w-100 text-center" style="color: #d97706 !important;"><i class="bi bi-journal-bookmark-fill me-2"></i>Proyecto (PEIC)</h6><div class="texto-trasero" id="lbl-peic-back"><span class="placeholder col-12"></span><span class="placeholder col-8"></span></div></div></div></div></div>
+    </div>
+
+    <div class="row mt-4 animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+        <div class="col-12">
+            <div class="banner-organigrama p-4 d-flex flex-column flex-md-row align-items-center justify-content-between shadow-sm" onclick="Enrutador.navegar('Cadena Supervisoria')" id="btn-acceso-organigrama">
+                <div class="d-flex align-items-center mb-3 mb-md-0 text-center text-md-start">
+                    <div class="bg-purple bg-opacity-10 p-3 rounded-circle me-3 d-none d-sm-block" style="color: #6d28d9; background-color: rgba(109, 40, 217, 0.1);"><i class="bi bi-diagram-3-fill fs-2"></i></div>
+                    <div><h5 class="fw-bold text-dark mb-1">Estructura Organizativa Institucional</h5><p class="text-muted small mb-0">Consulte el mapa oficial de dependencias, la cadena supervisoria y el personal activo de la escuela.</p></div>
+                </div>
+                <button class="btn fw-bold px-4 py-2 shadow-sm text-nowrap" style="background-color: #6d28d9; color: white; border-radius: 50rem;"><i class="bi bi-search me-2"></i> Explorar Organigrama</button>
+            </div>
+        </div>
+    </div>
+</div>

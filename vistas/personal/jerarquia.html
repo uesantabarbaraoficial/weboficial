@@ -1,0 +1,138 @@
+<style>
+    .tarjeta-btn { background: white; border-radius: 16px; border: 2px solid transparent; transition: all 0.3s ease; border-bottom: 4px solid #cbd5e1; cursor: pointer; }
+    .tarjeta-btn:hover { transform: translateY(-5px); border-bottom-color: #8b5cf6; box-shadow: 0 10px 25px rgba(139, 92, 246, 0.15); }
+    .tarjeta-btn.bloqueado { opacity: 0.5; filter: grayscale(100%); cursor: not-allowed; border-bottom-color: #e2e8f0; pointer-events: none; }
+    
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }
+
+    /* ✨ MOTOR DE ORGANIGRAMA COMPACTO (IDEAL PARA PDF Y MÓVIL) ✨ */
+    .contenedor-organigrama { 
+        width: 100%; min-height: 550px; overflow: auto; 
+        background-color: #f8fafc; border-radius: 1rem; 
+        border: 1px solid #dee2e6; text-align: center; padding: 15px; 
+    }
+    
+    .mi-organigrama { text-align: center; display: inline-block; white-space: nowrap; }
+    .mi-organigrama ul { padding-top: 15px; position: relative; display: flex; justify-content: center; align-items: flex-start; margin: 0; padding-left: 0; list-style: none; }
+    .mi-organigrama li { display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; padding: 15px 4px 0 4px; }
+    
+    /* Conectores más cortos */
+    .mi-organigrama li::before, .mi-organigrama li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #94a3b8; width: 50%; height: 15px; }
+    .mi-organigrama li::after { right: auto; left: 50%; border-left: 2px solid #94a3b8; }
+    .mi-organigrama li:only-child::after, .mi-organigrama li:only-child::before { display: none; }
+    .mi-organigrama li:only-child { padding-top: 0; }
+    .mi-organigrama li:first-child::before, .mi-organigrama li:last-child::after { border: 0 none; }
+    .mi-organigrama li:last-child::before { border-right: 2px solid #94a3b8; border-radius: 0 6px 0 0; }
+    .mi-organigrama li:first-child::after { border-radius: 6px 0 0 0; }
+    .mi-organigrama ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #94a3b8; width: 0; height: 15px; transform: translateX(-50%); }
+    
+    /* Tarjetas Compactas */
+    .nodo-cargo-custom {
+        border: 2px solid; border-radius: 8px; padding: 8px 10px; 
+        min-width: 130px; max-width: 170px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+        display: inline-block; background-color: white;
+        position: relative; z-index: 2; 
+        white-space: normal; /* Permite que el texto largo baje a la siguiente línea */
+        word-wrap: break-word;
+    }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="burbuja-3d burbuja-3"></div>
+
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white mb-3 px-3 py-2 shadow-sm fw-bold" style="color: #6d28d9; letter-spacing: 1px; font-size: 0.85rem;"><i class="bi bi-diagram-2 me-1"></i> ORGANIZACIÓN ESCOLAR</span>
+                    <h1 class="fw-bolder mb-2 text-white" id="titulo-jerarquia-main" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Cadena Supervisoria</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Organigrama y dependencias de la institución.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="jerarquia-dashboard" class="row g-4 animate__animated animate__fadeIn justify-content-center"></div>
+
+<div class="row mb-3 d-none animate__animated" id="btn-volver-dashboard">
+    <div class="col-12 text-center text-md-start">
+        <button class="btn btn-white shadow-sm fw-bold border rounded-pill px-4 hover-efecto" style="color: #6d28d9;" onclick="window.ModJerarquia.volverDashboard()">
+            <i class="bi bi-arrow-left me-2"></i>Volver al Menú
+        </button>
+    </div>
+</div>
+
+<div id="vista-constructor" class="row g-4 animate__animated d-none">
+    <div class="col-12 col-lg-5">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-primary" style="border-radius: 20px;">
+            <h5 class="fw-bold text-dark mb-4"><i class="bi bi-diagram-3-fill text-primary me-2"></i>1. Seleccionar Supervisor</h5>
+            <p class="text-muted small">Seleccione el cargo que actuará como jefe o director.</p>
+            <select id="sel-supervisor" class="form-select form-select-lg shadow-sm border-primary mb-3 input-moderno" onchange="window.ModJerarquia.alCambiarSupervisor()">
+                <option value="">-- Elija un Cargo --</option>
+            </select>
+            <div class="bg-light p-3 rounded-3 mt-4 border border-info border-opacity-25" id="info-supervisor">
+                <i class="bi bi-info-circle-fill text-info me-2"></i>Seleccione un cargo arriba.
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-lg-7">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-success position-relative" id="panel-supervisados" style="border-radius: 20px;">
+            <h5 class="fw-bold text-dark mb-3"><i class="bi bi-people-fill text-success me-2"></i>2. Asignar Supervisados</h5>
+            <p class="text-muted small mb-4">Marque los cargos que estarán directamente bajo el mando del supervisor seleccionado.</p>
+            
+            <div id="lista-cargos-check" class="row g-3" style="max-height: 300px; overflow-y: auto;">
+                <div class="col-12 text-center text-muted py-4">Esperando selección...</div>
+            </div>
+
+            <div id="btn-guardar-jerarquia-area" class="mt-4 pt-3 border-top text-end">
+                <button class="btn btn-success rounded-pill px-5 shadow-sm fw-bold hover-efecto" onclick="window.ModJerarquia.guardarJerarquia()"><i class="bi bi-save me-2"></i>Guardar Estructura</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="vista-mapa" class="row animate__animated d-none">
+    <div class="col-12">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm border-top border-5 border-dark" style="border-radius: 20px;">
+            
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-bezier2 text-primary me-2"></i>Mapa Institucional</h5>
+                
+                <div class="d-flex gap-3 align-items-center bg-light p-2 rounded-3 border shadow-sm flex-wrap">
+                    
+                    <div class="d-flex align-items-center border-end pe-3">
+                        <i class="bi bi-funnel text-muted me-2"></i>
+                        <select id="filtro-rama" class="form-select form-select-sm border-primary fw-bold text-dark" style="width: auto; min-width: 180px;" onchange="window.ModJerarquia.dibujarOrganigrama()">
+                            <option value="">Mostrar Toda la Escuela</option>
+                        </select>
+                    </div>
+
+                    <div class="form-check form-switch mb-0 d-flex align-items-center border-end pe-3">
+                        <input class="form-check-input mt-0 me-2" type="checkbox" id="chk-nombres" onchange="window.ModJerarquia.dibujarOrganigrama()" style="cursor:pointer; width: 35px; height: 18px;">
+                        <label class="form-check-label small fw-bold text-dark mt-1" for="chk-nombres" style="cursor:pointer;">Mostrar Nombres</label>
+                    </div>
+
+                    <button class="btn btn-sm btn-danger fw-bold shadow-sm px-3 rounded-pill hover-efecto" onclick="window.ModJerarquia.prepararPDF()">
+                        <i class="bi bi-file-earmark-pdf-fill me-1"></i> Exportar Oficial
+                    </button>
+                </div>
+            </div>
+            
+            <div class="contenedor-organigrama">
+                <div id="chart_div"></div>
+            </div>
+            
+        </div>
+    </div>
+</div>

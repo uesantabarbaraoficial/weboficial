@@ -1,0 +1,67 @@
+<style>
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    
+    /* CSS PAGINACIÓN */
+    .page-link { color: #0ea5e9; border: none; border-radius: 8px; margin: 0 3px; font-weight: bold; transition: all 0.2s; cursor: pointer; }
+    .page-item.active .page-link { background-color: #0ea5e9; color: white; box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3); }
+    .page-link:hover:not(.active) { background-color: rgba(14, 165, 233, 0.1); color: #0ea5e9; }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white text-info mb-3 px-3 py-2 shadow-sm fw-bold" style="letter-spacing: 1px; font-size: 0.85rem;"><i class="bi bi-shield-lock me-1"></i> SEGURIDAD Y ACCESOS</span>
+                    <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Preguntas de Seguridad</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Banco de preguntas para la recuperación de cuentas de usuario.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row animate__animated animate__fadeInUp">
+    <div class="col-md-12 col-xl-8 mx-auto">
+        <div class="card border-0 shadow-sm rounded-4 h-100" style="border-top: 5px solid #0ea5e9 !important;">
+            <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-patch-question-fill text-info me-2"></i>Banco de Preguntas</h5>
+                    <small class="text-muted">Preguntas disponibles para el registro inicial.</small>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <input type="text" id="buscador-preguntas" class="input-moderno form-control-sm border-info" placeholder="Buscar pregunta..." style="width: 250px;" onkeyup="window.ModPreguntas.filtrar()">
+                    <button class="btn fw-bold shadow-sm px-4 rounded-pill hover-efecto text-white" style="background-color: #0ea5e9;" onclick="window.ModPreguntas.nuevaPregunta()">
+                        <i class="bi bi-plus-lg me-2"></i>Añadir Pregunta
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small">
+                            <tr>
+                                <th class="ps-4">Pregunta de Seguridad</th>
+                                <th class="text-end pe-4" style="width: 150px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-preguntas"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-top p-3 d-flex justify-content-center rounded-bottom-4">
+                <nav><ul class="pagination mb-0" id="paginacion-preguntas"></ul></nav>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,129 @@
+<style>
+    /* ✨ BURBUJAS 3D Y EFECTOS ✨ */
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    
+    .card-btn-nav { cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid transparent; }
+    .card-btn-nav:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 188, 212, 0.15) !important; border-color: #00BCD4; }
+    .card-btn-nav.activo { border-color: #00BCD4; background-color: rgba(0, 188, 212, 0.05); }
+    .card-btn-nav .icono-box { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; transition: all 0.3s; }
+    .card-btn-nav.activo .icono-box { background: #00BCD4 !important; color: white !important; }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #00BCD4 0%, #00838F 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white text-info mb-3 px-3 py-2 shadow-sm fw-bold" style="letter-spacing: 1px; font-size: 0.85rem;"><i class="bi bi-folder-check me-1"></i> CONTROL DE ESTUDIOS</span>
+                    <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Grados y Salones</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Estructura académica y apertura de secciones.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4 animate__animated animate__fadeIn" id="nav-salones">
+    <div class="col-md-4" id="col-nav-grados">
+        <div class="card border-0 shadow-sm rounded-4 h-100 card-btn-nav text-center p-3 activo" id="tab-grados" onclick="window.ModSalones.cambiarVista('grados')">
+            <div class="icono-box bg-info bg-opacity-10 text-info mx-auto mb-3"><i class="bi bi-layers-fill"></i></div>
+            <h5 class="fw-bold text-dark mb-1">Grupos y Grados</h5>
+            <small class="text-muted">Crear años o niveles de estudio.</small>
+        </div>
+    </div>
+    <div class="col-md-4" id="col-nav-secciones">
+        <div class="card border-0 shadow-sm rounded-4 h-100 card-btn-nav text-center p-3" id="tab-secciones" onclick="window.ModSalones.cambiarVista('secciones')">
+            <div class="icono-box bg-info bg-opacity-10 text-info mx-auto mb-3"><i class="bi bi-alphabet"></i></div>
+            <h5 class="fw-bold text-dark mb-1">Secciones</h5>
+            <small class="text-muted">Definir identificadores (A, B, U...).</small>
+        </div>
+    </div>
+    <div class="col-md-4" id="col-nav-apertura">
+        <div class="card border-0 shadow-sm rounded-4 h-100 card-btn-nav text-center p-3" id="tab-salones" onclick="window.ModSalones.cambiarVista('salones')">
+            <div class="icono-box bg-info bg-opacity-10 text-info mx-auto mb-3"><i class="bi bi-door-open-fill"></i></div>
+            <h5 class="fw-bold text-dark mb-1">Apertura de Salones</h5>
+            <small class="text-muted">Vincular grados y secciones.</small>
+        </div>
+    </div>
+</div>
+
+<div class="row animate__animated animate__fadeInUp" id="contenedor-vistas">
+    
+    <div class="col-12 vista-modulo" id="vista-grados">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="border-top: 5px solid #00BCD4 !important;">
+            <div class="alert alert-warning m-0 rounded-0 border-0 border-bottom text-dark" style="background-color: #fffbeb;">
+                <i class="bi bi-exclamation-triangle-fill text-warning me-2 fs-5 align-middle"></i>
+                <span class="small"><b>IMPORTANTE:</b> El orden de esta lista define la escalera lógica para la <b>Promoción Escolar Masiva</b>. Utilice las flechas para ordenar jerárquicamente desde el menor grado (arriba) hasta el año de egreso (abajo).</span>
+            </div>
+
+            <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-layers text-info me-2"></i>Catálogo de Grados / Años</h5>
+                <button class="btn btn-sm btn-info text-white fw-bold shadow-sm hover-efecto btn-crear-grado" onclick="window.ModSalones.nuevoParametro('Grado_Anio', 'Ej: 1er Año / 2do Grado')"><i class="bi bi-plus-lg me-1"></i>Nuevo Grado</button>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="lista-grados"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 vista-modulo" id="vista-secciones" style="display: none;">
+        <div class="card border-0 shadow-sm rounded-4" style="border-top: 5px solid #00ACC1 !important;">
+            <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center rounded-top-4">
+                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-alphabet text-info me-2"></i>Identificadores de Sección</h5>
+                <button class="btn btn-sm btn-info text-white fw-bold shadow-sm hover-efecto btn-crear-seccion" onclick="window.ModSalones.nuevoParametro('Seccion', 'Ej: A, B, U')"><i class="bi bi-plus-lg me-1"></i>Nueva Sección</button>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="lista-secciones"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 vista-modulo" id="vista-salones" style="display: none;">
+        <div class="card border-0 shadow-sm rounded-4" style="border-top: 5px solid #00838F !important;">
+            <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center flex-wrap gap-3 rounded-top-4">
+                <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-door-open text-info me-2"></i>Salones Aperturados</h5>
+                
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                    <div class="input-group input-group-sm shadow-sm" style="width: auto;">
+                        <span class="input-group-text bg-light border-info"><i class="bi bi-sort-down"></i></span>
+                        <select id="filtro-salones" class="form-select border-info fw-bold text-dark" style="min-width: 160px;" onchange="window.ModSalones.aplicarFiltroSalones()">
+                            <option value="nombre_salon">Ordenar por Nombre</option>
+                            <option value="nivel_educativo">Ordenar por Nivel</option>
+                            <option value="grado_anio">Ordenar por Grado</option>
+                            <option value="seccion">Ordenar por Sección</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-sm btn-info text-white fw-bold shadow-sm hover-efecto btn-crear-salon" onclick="window.ModSalones.abrirModalSalon()">
+                        <i class="bi bi-plus-lg me-1"></i>Aperturar Salón
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light text-muted small">
+                            <tr>
+                                <th class="ps-4">Código / Nombre</th>
+                                <th>Nivel Educativo</th>
+                                <th>Grado</th>
+                                <th>Sección</th>
+                                <th class="text-end pe-4">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-salones"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

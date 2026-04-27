@@ -1,0 +1,99 @@
+<style>
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #64748b 0%, #334155 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white text-secondary mb-3 px-3 py-2 shadow-sm fw-bold" style="letter-spacing: 1px; font-size: 0.85rem;">
+                        <i class="bi bi-database-fill-gear me-1"></i> BASE DE DATOS
+                    </span>
+                    <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Gestión de Registros</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Edición directa y limpieza masiva de tablas temporales.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row animate__animated animate__fadeInUp">
+    <div class="col-12 col-xl-10 mx-auto">
+        <ul class="nav nav-pills mb-4 nav-justified bg-white p-2 rounded-pill shadow-sm border" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active rounded-pill fw-bold" id="pills-invitados-tab" data-bs-toggle="pill" data-bs-target="#pills-invitados" type="button" role="tab">
+                    <i class="bi bi-person-badge-fill me-2"></i>Tabla: Invitados
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link rounded-pill fw-bold" id="pills-solicitudes-tab" data-bs-toggle="pill" data-bs-target="#pills-solicitudes" type="button" role="tab">
+                    <i class="bi bi-inbox-fill me-2"></i>Tabla: Solicitudes (Cupos)
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="pills-tabContent">
+            
+            <div class="tab-pane fade show active" id="pills-invitados" role="tabpanel">
+                <div class="bg-white shadow-sm rounded-4 border-top border-5 border-secondary overflow-hidden">
+                    <div class="p-4 border-bottom d-flex justify-content-between align-items-center bg-light">
+                        <h5 class="fw-bold text-dark m-0"><i class="bi bi-people-fill text-secondary me-2"></i>Registros de Invitados</h5>
+                        <button class="btn btn-danger fw-bold shadow-sm rounded-pill px-4" onclick="window.ModRegistros.limpiarTabla('invitados')">
+                            <i class="bi bi-trash3-fill me-2"></i>Limpiar Tabla Completa
+                        </button>
+                    </div>
+                    <div class="table-responsive p-0">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-muted small">
+                                <tr>
+                                    <th class="ps-4">Cédula</th>
+                                    <th>Nombre Completo</th>
+                                    <th>Teléfono</th>
+                                    <th>Último Ingreso</th>
+                                    <th class="text-end pe-4">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tb-invitados"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="pills-solicitudes" role="tabpanel">
+                <div class="bg-white shadow-sm rounded-4 border-top border-5 border-info overflow-hidden">
+                    <div class="p-4 border-bottom d-flex justify-content-between align-items-center bg-light">
+                        <h5 class="fw-bold text-dark m-0"><i class="bi bi-file-earmark-text-fill text-info me-2"></i>Solicitudes de Cupo</h5>
+                        <button class="btn btn-danger fw-bold shadow-sm rounded-pill px-4" onclick="window.ModRegistros.limpiarTabla('solicitudes')">
+                            <i class="bi bi-trash3-fill me-2"></i>Limpiar Tabla Completa
+                        </button>
+                    </div>
+                    <div class="alert alert-warning m-3 small fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i> ¡ATENCIÓN! Limpiar esta tabla borrará permanentemente todo el historial de admisiones (Aprobados, Rechazados, etc.). Solo úselo al iniciar un nuevo año escolar.</div>
+                    <div class="table-responsive p-0">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light text-muted small">
+                                <tr>
+                                    <th class="ps-4">Código</th>
+                                    <th>Estudiante</th>
+                                    <th>Grado Solicitado</th>
+                                    <th>Estatus</th>
+                                    <th class="text-end pe-4">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tb-solicitudes"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

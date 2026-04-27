@@ -1,0 +1,362 @@
+<style>
+    .wizard-container { position: relative; display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; padding: 0 1rem; }
+    .wizard-line { position: absolute; top: 20px; left: 8%; right: 8%; height: 2px; background-color: #e2e8f0; z-index: 1; }
+    .wizard-step-wrapper { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; cursor: pointer; width: 80px; }
+    .wizard-step { width: 40px; height: 40px; border-radius: 50%; background-color: white; border: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #94a3b8; transition: all 0.3s; margin-bottom: 8px; }
+    
+    .wizard-step-wrapper:hover .wizard-step { border-color: #8b5cf6; color: #8b5cf6; }
+    .wizard-step.activo { background-color: #8b5cf6; border-color: #8b5cf6; color: white; box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2); }
+    .wizard-step.completado { background-color: white; border-color: #10b981; color: #10b981; }
+    .wizard-step-label { font-size: 0.75rem; font-weight: 600; color: #64748b; text-align: center; transition: all 0.3s; }
+    .wizard-step-wrapper:hover .wizard-step-label, .wizard-step.activo + .wizard-step-label { color: #1e293b; }
+    
+    .wizard-panel { display: none; animation: fadeIn 0.4s ease-out; }
+    .wizard-panel.activo { display: block; }
+    
+    .seccion-titulo { padding: 0.75rem 1.25rem; background-color: #f8fafc; border-left: 4px solid #8b5cf6; border-radius: 0 8px 8px 0; font-weight: 700; margin-bottom: 1.5rem; color: #1e293b; display: flex; align-items: center; }
+    .seccion-titulo i { font-size: 1.2rem; color: #8b5cf6; margin-right: 10px; }
+    
+    .card-resumen { border: 1px solid #e2e8f0; border-radius: 12px; transition: all 0.3s; height: 100%; }
+    .card-resumen:hover { border-color: #cbd5e1; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); transform: translateY(-3px); }
+    .card-resumen .card-header { background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; font-weight: 700; color: #334155; padding: 1rem 1.25rem; border-radius: 12px 12px 0 0; }
+    .data-row { display: flex; padding: 0.6rem 0; border-bottom: 1px dashed #e2e8f0; }
+    .data-row:last-child { border-bottom: none; }
+    .data-label { width: 40%; font-size: 0.8rem; color: #64748b; font-weight: 600; }
+    .data-value { width: 60%; font-size: 0.85rem; color: #0f172a; font-weight: 600; word-break: break-word; }
+
+    .req { color: #ef4444; margin-left: 3px; font-weight: bold; }
+    .label-purple { color: #6d28d9; font-weight: 600; }
+    .label-pink { color: #be185d; font-weight: 600; }
+    .label-blue { color: #0369a1; font-weight: 600; }
+    
+    .btn-estudiante-sel { text-align: left; padding: 15px; border-radius: 12px; border: 2px solid #e2e8f0; background: white; transition: all 0.2s; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+    .btn-estudiante-sel:hover { border-color: #8b5cf6; background: #f5f3ff; transform: translateY(-2px); }
+    .btn-estudiante-sel .icono-est { width: 45px; height: 45px; border-radius: 50%; background: #e0e7ff; color: #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-right: 15px; flex-shrink: 0; }
+</style>
+
+<div class="container-fluid p-0 animate__animated animate__fadeIn">
+    <div id="fase-selector" style="display: block;">
+        <div class="row mb-4 align-items-end">
+            <div class="col-md-8">
+                <h2 class="fw-bolder text-dark mb-1">Mis Representados</h2>
+                <p class="text-muted fw-bold mb-0">Seleccione el estudiante para revisar o actualizar su ficha técnica.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <button class="btn btn-outline-primary fw-bold rounded-pill shadow-sm" onclick="Enrutador.navegar('Mis Solicitudes')">
+                    <i class="bi bi-card-checklist me-2"></i>Ver Estatus de Trámites
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-4 p-md-5 bg-light rounded-4" id="contenedor-mis-estudiantes">
+                        <div class="text-center py-5">
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <p class="text-muted mt-3 fw-bold">Cargando expedientes vinculados...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="fase-formulario" style="display: none;">
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+            <div class="card-body p-4 d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+                <div class="d-flex align-items-center text-white">
+                    <button class="btn btn-light btn-sm rounded-circle me-3 shadow" onclick="window.ModActualizacion.volverAlSelector()" title="Volver"><i class="bi bi-arrow-left text-dark"></i></button>
+                    <div class="bg-white bg-opacity-10 p-3 rounded-circle me-3 border border-light border-opacity-25"><i class="bi bi-person-vcard fs-3"></i></div>
+                    <div>
+                        <span class="badge bg-danger mb-1 shadow-sm">Ficha de Actualización de Datos</span>
+                        <h4 class="fw-bold mb-0 text-white" id="lbl-nombre-est-top">Cargando...</h4>
+                        <p class="mb-0 text-white opacity-75 small fw-bold">C.I / C.E: <span id="lbl-cedula-est-top">---</span> | Nivel: <span id="lbl-nivel-est-top">---</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4 p-md-5">
+                
+                <div class="wizard-container d-none d-md-flex">
+                    <div class="wizard-line"></div>
+                    <div class="wizard-step-wrapper" onclick="window.ModActualizacion.irAPaso(1)">
+                        <div class="wizard-step activo" id="stepper-1">1</div>
+                        <div class="wizard-step-label">Identidad</div>
+                    </div>
+                    <div class="wizard-step-wrapper" onclick="window.ModActualizacion.irAPaso(2)">
+                        <div class="wizard-step" id="stepper-2">2</div>
+                        <div class="wizard-step-label">Nacimiento</div>
+                    </div>
+                    <div class="wizard-step-wrapper" onclick="window.ModActualizacion.irAPaso(3)">
+                        <div class="wizard-step" id="stepper-3">3</div>
+                        <div class="wizard-step-label">Salud y Física</div>
+                    </div>
+                    <div class="wizard-step-wrapper" onclick="window.ModActualizacion.irAPaso(4)">
+                        <div class="wizard-step" id="stepper-4">4</div>
+                        <div class="wizard-step-label">Representante</div>
+                    </div>
+                    <div class="wizard-step-wrapper" onclick="window.ModActualizacion.irAPaso(5)">
+                        <div class="wizard-step" id="stepper-5">5</div>
+                        <div class="wizard-step-label">Madre/Padre</div>
+                    </div>
+                    <div class="wizard-step-wrapper" onclick="window.ModActualizacion.irAPaso(6)">
+                        <div class="wizard-step" id="stepper-6">6</div>
+                        <div class="wizard-step-label">Transporte</div>
+                    </div>
+                    <div class="wizard-step-wrapper" onclick="window.ModActualizacion.irAPaso(7)">
+                        <div class="wizard-step" id="stepper-7">7</div>
+                        <div class="wizard-step-label">Encuesta</div>
+                    </div>
+                </div>
+
+                <div class="d-md-none mb-4 text-center">
+                    <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill">Paso <span id="lbl-paso-movil">1</span> de 7</span>
+                </div>
+
+                <div class="wizard-panel activo" id="paso-1">
+                    <div class="seccion-titulo"><i class="bi bi-person-bounding-box"></i>Identidad del Estudiante</div>
+                    <div class="alert alert-warning small fw-bold mb-4 shadow-sm"><i class="bi bi-exclamation-triangle-fill me-2"></i>Los nombres y la cédula están bloqueados. Si existe un error en estos datos, debe dirigirse presencialmente a Control de Estudios con la partida de nacimiento.</div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label fw-bold text-muted">Nombres y Apellidos</label><input type="text" class="input-moderno bg-light text-muted" id="est-nombres" readonly></div>
+                        <div class="col-md-3"><label class="form-label fw-bold text-muted">Cédula Escolar/Identidad</label><input type="text" class="input-moderno bg-light text-muted" id="est-cedula" readonly></div>
+                        <div class="col-md-3"><label class="form-label label-purple">Género<span class="req">*</span></label><select class="input-moderno" id="est-genero"><option value="">Seleccione</option><option>Masculino</option><option>Femenino</option></select></div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-2">
+                    <div class="seccion-titulo"><i class="bi bi-calendar-heart"></i>Datos de Nacimiento</div>
+                    <div class="row g-3">
+                        <div class="col-md-4"><label class="form-label label-purple">Fecha de Nacimiento<span class="req">*</span></label><input type="date" class="input-moderno text-dark" id="est-fecha-nac"></div>
+                        <div class="col-md-4"><label class="form-label label-purple">País de Origen<span class="req">*</span></label><select class="input-moderno" id="est-pais" onchange="window.ModActualizacion.toggleNacionalidad()"><option value="Venezuela">Venezuela</option><option value="Extranjero">Extranjero</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Nacionalidad<span class="req">*</span></label><select class="input-moderno" id="est-nacionalidad"><option value="">Seleccione</option><option value="Venezolano">Venezolano (V)</option><option value="Extranjero">Extranjero (E)</option></select></div>
+                        
+                        <div class="col-12 mt-4"><h6 class="fw-bold text-dark border-bottom pb-2">Lugar de Nacimiento</h6></div>
+                        
+                        <div class="col-md-4" id="div-estado-nac"><label class="form-label label-purple">Estado<span class="req">*</span></label><select class="input-moderno" id="est-estado-nac" onchange="window.ModActualizacion.cargarMunicipios('nac')"><option value="">Seleccione Estado</option></select></div>
+                        <div class="col-md-4" id="div-municipio-nac"><label class="form-label label-purple">Municipio<span class="req">*</span></label><select class="input-moderno" id="est-municipio-nac" onchange="window.ModActualizacion.cargarParroquias('nac')" disabled><option value="">Seleccione Municipio</option></select></div>
+                        <div class="col-md-4" id="div-parroquia-nac"><label class="form-label label-purple">Parroquia<span class="req">*</span></label><select class="input-moderno" id="est-parroquia-nac" disabled><option value="">Seleccione Parroquia</option></select></div>
+                        <div class="col-md-4 d-none" id="div-ciudad-extranjera"><label class="form-label label-purple">Ciudad Extranjera<span class="req">*</span></label><input type="text" class="input-moderno txt-format" id="est-ciudad-ext"></div>
+                        <div class="col-md-8"><label class="form-label label-purple">Lugar Específico de Nacimiento (Hospital/Clínica)</label><input type="text" class="input-moderno txt-format" id="est-lugar-nac"></div>
+                        
+                        <div class="col-12 mt-4"><h6 class="fw-bold text-dark border-bottom pb-2">Datos de Partida de Nacimiento</h6></div>
+                        <div class="col-md-4"><label class="form-label label-purple">N° Folio</label><input type="text" class="input-moderno txt-format" id="est-folio"></div>
+                        <div class="col-md-4"><label class="form-label label-purple">N° Acta</label><input type="text" class="input-moderno txt-format" id="est-acta"></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Fecha de Acta</label><input type="date" class="input-moderno text-dark" id="est-fecha-acta"></div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-3">
+                    <div class="seccion-titulo"><i class="bi bi-heart-pulse"></i>Salud, Condición Física, Deporte y Cultura</div>
+                    <div class="row g-3">
+                        <div class="col-md-3"><label class="form-label label-purple">Talla Franela<span class="req">*</span></label><select class="input-moderno" id="est-talla-f"><option value="">Sel</option><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option>14</option><option>16</option><option>S</option><option>M</option><option>L</option><option>XL</option></select></div>
+                        <div class="col-md-3"><label class="form-label label-purple">Talla Pantalón<span class="req">*</span></label><select class="input-moderno" id="est-talla-p"><option value="">Sel</option><option>4</option><option>6</option><option>8</option><option>10</option><option>12</option><option>14</option><option>16</option><option>28</option><option>30</option><option>32</option><option>34</option><option>36</option></select></div>
+                        <div class="col-md-3"><label class="form-label label-purple">Talla Calzado<span class="req">*</span></label><select class="input-moderno" id="est-talla-z"><option value="">Sel</option><option>25</option><option>26</option><option>27</option><option>28</option><option>29</option><option>30</option><option>31</option><option>32</option><option>33</option><option>34</option><option>35</option><option>36</option><option>37</option><option>38</option><option>39</option><option>40</option><option>41</option><option>42</option><option>43</option><option>44</option></select></div>
+                        <div class="col-md-3"><label class="form-label label-purple">Estatura (Metros)<span class="req">*</span></label><input type="text" class="input-moderno float-mask text-dark" id="est-estatura" placeholder="Ej: 1.45"></div>
+                        <div class="col-md-3"><label class="form-label label-purple">Peso (Kg)<span class="req">*</span></label><input type="text" class="input-moderno float-mask text-dark" id="est-peso" placeholder="Ej: 45.5"></div>
+                        
+                        <div class="col-md-9"><label class="form-label label-purple">Alergias (Medicamentos, Alimentos, etc.)</label><input type="text" class="input-moderno txt-format" id="est-alergias" placeholder="Especifique o escriba 'Ninguna'"></div>
+                        
+                        <div class="col-md-12">
+                            <label class="form-label label-purple">Condición Neurológica</label>
+                            <select class="input-moderno text-dark" id="est-condicion">
+                                <option value="">Seleccione...</option>
+                                <option value="Neurotípico">Neurotípico</option>
+                                <option value="Neurodivergente">Neurodivergente</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-12 mt-4"><div class="seccion-titulo bg-success bg-opacity-10 border-success text-success"><i class="bi bi-palette-fill text-success me-2"></i>Deporte y Cultura</div></div>
+                        <div class="col-md-6">
+                            <label class="form-label label-purple">¿Práctica alguna disciplina deportiva?</label>
+                            <select class="input-moderno text-dark" id="est-deporte" onchange="window.ModActualizacion.evaluarDeporte()">
+                                <option value="">Seleccione...</option>
+                                <option value="Ninguna">Ninguna</option>
+                                <option value="Ajedrez">Ajedrez</option>
+                                <option value="Atletismo">Atletismo</option>
+                                <option value="Baloncesto">Baloncesto</option>
+                                <option value="Béisbol">Béisbol</option>
+                                <option value="Fútbol Campo">Fútbol Campo</option>
+                                <option value="Fútbol Sala">Fútbol Sala</option>
+                                <option value="Gimnasia">Gimnasia</option>
+                                <option value="Kickingball">Kickingball</option>
+                                <option value="Natación">Natación</option>
+                                <option value="Voleibol">Voleibol</option>
+                                <option value="Otra">Otra (Especificar)</option>
+                            </select>
+                            <input type="text" class="input-moderno txt-format mt-2" id="est-deporte-otro" placeholder="Especifique qué deporte..." style="display: none;">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label label-purple">¿Inscrito en academia deportiva del estado?</label>
+                            <select class="input-moderno text-dark" id="est-academia-deporte">
+                                <option value="">Seleccione...</option>
+                                <option value="Si">Sí</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <label class="form-label label-purple">¿Ejecuta algún instrumento musical?</label>
+                            <select class="input-moderno text-dark" id="est-cultura" onchange="window.ModActualizacion.evaluarCultura()">
+                                <option value="">Seleccione...</option>
+                                <option value="Ninguno">Ninguno</option>
+                                <option value="Arpa">Arpa</option>
+                                <option value="Bandola">Bandola</option>
+                                <option value="Batería / Percusión">Batería / Percusión</option>
+                                <option value="Canto / Coral">Canto / Coral</option>
+                                <option value="Cuatro">Cuatro</option>
+                                <option value="Danza / Baile">Danza / Baile</option>
+                                <option value="Flauta">Flauta</option>
+                                <option value="Guitarra">Guitarra</option>
+                                <option value="Mandolina">Mandolina</option>
+                                <option value="Teclado / Piano">Teclado / Piano</option>
+                                <option value="Violín">Violín</option>
+                                <option value="Otro">Otro (Especificar)</option>
+                            </select>
+                            <input type="text" class="input-moderno txt-format mt-2" id="est-cultura-otro" placeholder="Especifique qué instrumento o actividad..." style="display: none;">
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <label class="form-label label-purple">¿Inscrito en academia musical/cultural del estado?</label>
+                            <select class="input-moderno text-dark" id="est-academia-cultura">
+                                <option value="">Seleccione...</option>
+                                <option value="Si">Sí</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 mt-4"><div class="seccion-titulo bg-info bg-opacity-10 border-info text-info"><i class="bi bi-laptop me-2"></i>Recursos Tecnológicos</div></div>
+                        <div class="col-md-4"><label class="form-label label-purple">¿Posee Computadora?<span class="req">*</span></label><select class="input-moderno text-dark" id="est-pc"><option value="">Seleccione</option><option>Si</option><option>No</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-purple">¿Acceso a Internet en casa?<span class="req">*</span></label><select class="input-moderno text-dark" id="est-internet"><option value="">Seleccione</option><option>Si</option><option>No</option></select></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Celular del Estudiante</label><input type="text" class="input-moderno telf-mask" id="est-celular" placeholder="0400-0000000"></div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-4">
+                    <div class="seccion-titulo"><i class="bi bi-person-badge"></i>Datos del Representante Legal</div>
+                    <div class="alert alert-info small fw-bold"><i class="bi bi-info-circle-fill me-2"></i>Estos son los datos de la persona que tiene la custodia y responsabilidad legal del estudiante en la institución.</div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-4"><label class="form-label label-purple">Cédula<span class="req">*</span></label><input type="text" class="input-moderno text-dark num-only" id="rep-cedula"></div>
+                        <div class="col-md-8"><label class="form-label label-purple">Nombres y Apellidos<span class="req">*</span></label><input type="text" class="input-moderno txt-format" id="rep-nombres"></div>
+                        <div class="col-md-4"><label class="form-label label-purple">Parentesco<span class="req">*</span></label><select class="input-moderno" id="rep-parentesco"><option value="">Seleccione</option><option>Madre</option><option>Padre</option><option>Abuelo(a)</option><option>Tío(a)</option><option>Hermano(a)</option><option>Otro</option></select></div>
+                        <div class="col-md-5"><label class="form-label label-purple">Relación Laboral con PDVSA<span class="req">*</span></label><select class="input-moderno" id="rep-relacion" onchange="window.ModActualizacion.evaluarCorporativo()"><option value="">Seleccione</option><option>Activo</option><option>Jubilado</option><option>Fallecido</option><option>Contratista</option><option>Comunidad / No aplica</option></select></div>
+                        <div class="col-md-3"><label class="form-label label-purple">Teléfono Celular<span class="req">*</span></label><div class="input-group"><select class="form-select border-2" id="rep-cod-tel" style="max-width: 100px;"><option value="0414">0414</option><option value="0424">0424</option><option value="0416">0416</option><option value="0426">0426</option><option value="0412">0412</option></select><input type="text" class="form-control border-2 text-dark num-only" id="rep-telefono" maxlength="7"></div></div>
+                        <div class="col-md-6"><label class="form-label label-purple">Correo Personal<span class="req">*</span></label><input type="email" class="input-moderno text-dark text-lowercase" id="rep-correo"></div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label label-purple">Profesión u Oficio <span class="req">*</span></label>
+                            <input type="text" class="input-moderno txt-format text-dark" id="rep-profesion" placeholder="Ej: Ingeniero, Docente, Ama de casa...">
+                        </div>
+
+                        <div class="col-12"><label class="form-label label-purple">Dirección de Habitación (Detallada)<span class="req">*</span></label><textarea class="input-moderno txt-format text-dark" id="rep-direccion" rows="2" placeholder="Sector, Calle, Manzana, Casa..."></textarea></div>
+                    </div>
+
+                    <div id="bloque-corporativo" class="mt-4" style="display: none;">
+                        <h6 class="fw-bold text-dark border-bottom pb-2">Datos Corporativos (Solo Personal PDVSA)</h6>
+                        <div class="row g-3">
+                            <div class="col-md-3"><label class="form-label label-purple">Indicador de Red</label><input type="text" class="input-moderno txt-format" id="corp-red"></div>
+                            <div class="col-md-5"><label class="form-label label-purple">Correo Corporativo</label><input type="email" class="input-moderno" id="corp-correo" placeholder="@pdvsa.com"></div>
+                            <div class="col-md-4"><label class="form-label label-purple">Tipo de Nómina</label><select class="input-moderno" id="corp-nomina"><option value="">Seleccione</option><option>Ejecutiva</option><option>Mayor</option><option>Mensual</option><option>Diaria</option></select></div>
+                            <div class="col-md-6"><label class="form-label label-purple">Negocio / Filial</label><select class="input-moderno" id="corp-filial" onchange="window.ModActualizacion.cargarGerencias()"><option value="">Seleccione Filial</option></select></div>
+                            <div class="col-md-6"><label class="form-label label-purple">Gerencia Base / Unidad</label><select class="input-moderno" id="corp-gerencia" disabled><option value="">Seleccione Gerencia</option></select></div>
+                            <div class="col-md-12"><label class="form-label label-purple">Reconocido Por (En caso de abuelos/tíos)</label><input type="text" class="input-moderno txt-format" id="corp-reconocido" placeholder="Solo si aplica"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-5">
+                    <div class="row g-5">
+                        <div class="col-md-6 border-md-end">
+                            <div class="seccion-titulo bg-pink bg-opacity-10 border-pink text-pink mb-3"><i class="bi bi-person-heart text-pink me-2"></i>Datos de la Madre</div>
+                            <div class="form-check form-switch mb-4 bg-light p-2 rounded-3 border">
+                                <input class="form-check-input ms-2" type="checkbox" id="chk-rep-es-madre" onchange="window.ModActualizacion.copiarDatosRepresentante('madre')" style="cursor:pointer;">
+                                <label class="form-check-label ms-2 fw-bold text-dark" for="chk-rep-es-madre">Ella es la Representante Legal (Copiar datos)</label>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-12"><label class="form-label label-pink small">Nombres y Apellidos<span class="req">*</span></label><input type="text" class="input-moderno txt-format" id="madre-nombres"></div>
+                                <div class="col-12"><label class="form-label label-pink small">Cédula<span class="req">*</span></label><input type="text" class="input-moderno num-only" id="madre-cedula"></div>
+                                <div class="col-12"><label class="form-label label-pink small">Teléfono</label><div class="input-group"><select class="form-select border-2" id="madre-cod-tel" style="max-width: 90px;"><option>0414</option><option>0424</option><option>0416</option><option>0426</option><option>0412</option></select><input type="text" class="form-control border-2 text-dark num-only" id="madre-tel" maxlength="7"></div></div>
+                                <div class="col-12"><label class="form-label label-pink small">Correo Electrónico</label><input type="email" class="input-moderno text-lowercase" id="madre-correo"></div>
+                                <div class="col-12"><label class="form-label label-pink small">Es Trabajadora PDVSA?</label><select class="input-moderno" id="madre-pdvsa"><option value="">Seleccione</option><option>Si</option><option>No</option></select></div>
+                                
+                                <div class="col-12 mt-2">
+                                    <label class="form-label label-pink small">Profesión u Oficio</label>
+                                    <input type="text" class="input-moderno txt-format" id="madre-profesion" placeholder="Ej: Abogada, Doctora, Enfermera...">
+                                </div>
+
+                                <div class="col-12 mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="chk-dir-madre" onchange="window.ModActualizacion.copiarDireccionRepresentante('madre')">
+                                        <label class="form-check-label small fw-bold text-muted">Misma dirección del representante</label>
+                                    </div>
+                                    <textarea class="input-moderno mt-2 txt-format" id="madre-dir" rows="2" placeholder="Dirección de la Madre"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="seccion-titulo bg-blue bg-opacity-10 border-blue text-blue mb-3"><i class="bi bi-person-arms-up text-blue me-2"></i>Datos del Padre</div>
+                            <div class="form-check form-switch mb-4 bg-light p-2 rounded-3 border">
+                                <input class="form-check-input ms-2" type="checkbox" id="chk-rep-es-padre" onchange="window.ModActualizacion.copiarDatosRepresentante('padre')" style="cursor:pointer;">
+                                <label class="form-check-label ms-2 fw-bold text-dark" for="chk-rep-es-padre">Él es el Representante Legal (Copiar datos)</label>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-12"><label class="form-label label-blue small">Nombres y Apellidos</label><input type="text" class="input-moderno txt-format" id="padre-nombres"></div>
+                                <div class="col-12"><label class="form-label label-blue small">Cédula</label><input type="text" class="input-moderno num-only" id="padre-cedula"></div>
+                                <div class="col-12"><label class="form-label label-blue small">Teléfono</label><div class="input-group"><select class="form-select border-2" id="padre-cod-tel" style="max-width: 90px;"><option>0414</option><option>0424</option><option>0416</option><option>0426</option><option>0412</option></select><input type="text" class="form-control border-2 text-dark num-only" id="padre-tel" maxlength="7"></div></div>
+                                <div class="col-12"><label class="form-label label-blue small">Correo Electrónico</label><input type="email" class="input-moderno text-lowercase" id="padre-correo"></div>
+                                <div class="col-12"><label class="form-label label-blue small">Es Trabajador PDVSA?</label><select class="input-moderno" id="padre-pdvsa"><option value="">Seleccione</option><option>Si</option><option>No</option></select></div>
+                                
+                                <div class="col-12 mt-2">
+                                    <label class="form-label label-blue small">Profesión u Oficio</label>
+                                    <input type="text" class="input-moderno txt-format" id="padre-profesion" placeholder="Ej: Mecánico, Chofer, Administrador...">
+                                </div>
+
+                                <div class="col-12 mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="chk-dir-padre" onchange="window.ModActualizacion.copiarDireccionRepresentante('padre')">
+                                        <label class="form-check-label small fw-bold text-muted">Misma dirección del representante</label>
+                                    </div>
+                                    <textarea class="input-moderno mt-2 txt-format" id="padre-dir" rows="2" placeholder="Dirección del Padre"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-6">
+                    <div class="seccion-titulo"><i class="bi bi-bus-front"></i>Servicio de Transporte Escolar</div>
+                    <div class="alert alert-info small fw-bold shadow-sm mb-4"><i class="bi bi-info-circle-fill me-2"></i>La asignación de rutas está sujeta a disponibilidad de unidades y evaluación de logística.</div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label label-purple">Requiere Servicio de Transporte?<span class="req">*</span></label><select class="input-moderno" id="est-req-transporte" onchange="window.ModActualizacion.toggleTransporte()"><option value="">Seleccione</option><option value="Si">Sí</option><option value="No">No, se traslada por medios propios</option></select></div>
+                        <div class="col-md-6" id="div-ruta-transporte"><label class="form-label label-purple">Ruta Cercana a su Domicilio<span class="req">*</span></label><select class="input-moderno" id="est-ruta" onchange="window.ModActualizacion.cargarParadas()" disabled><option value="">Seleccione Ruta</option></select></div>
+                        <div class="col-md-12 mt-3" id="div-parada-transporte"><label class="form-label label-purple">Punto de Parada Específico<span class="req">*</span></label><select class="input-moderno" id="est-parada" disabled><option value="">Seleccione Parada</option></select></div>
+                    </div>
+                </div>
+
+                <div class="wizard-panel" id="paso-7">
+                    <div class="seccion-titulo"><i class="bi bi-chat-dots"></i>Encuesta Rápida (Opcional)</div>
+                    <div class="alert alert-secondary small mb-4 shadow-sm">Su opinión nos ayuda a mejorar nuestros procesos. Estas preguntas son opcionales pero muy valiosas para nosotros.</div>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label label-purple">Eval. Metodología Virtual (Canaimitas)</label><select class="input-moderno text-dark" id="enc-metodologia"><option value="">Seleccione...</option><option>Excelente</option><option>Bueno</option><option>Regular</option><option>Malo</option></select></div>
+                        <div class="col-md-6"><label class="form-label label-purple">Eval. Uso de Recursos TIC</label><select class="input-moderno text-dark" id="enc-recursos"><option value="">Seleccione...</option><option>Excelente</option><option>Bueno</option><option>Regular</option><option>Malo</option></select></div>
+                        <div class="col-md-6"><label class="form-label label-purple">Eval. Medios de Comunicación (WA, Telegram)</label><select class="input-moderno text-dark" id="enc-medios"><option value="">Seleccione...</option><option>Excelente</option><option>Bueno</option><option>Regular</option><option>Malo</option></select></div>
+                        <div class="col-md-6"><label class="form-label label-purple">Eval. Emisión de Boletines</label><select class="input-moderno text-dark" id="enc-boletines"><option value="">Seleccione...</option><option>Excelente</option><option>Bueno</option><option>Regular</option><option>Malo</option></select></div>
+                        <div class="col-md-6"><label class="form-label label-purple">Eval. Módulo Actualización</label><select class="input-moderno text-dark" id="enc-actualizacion"><option value="">Seleccione...</option><option>Excelente</option><option>Bueno</option><option>Regular</option><option>Malo</option></select></div>
+                        <div class="col-12"><label class="form-label label-purple">Aportes y Sugerencias</label><textarea id="enc-aportes" class="input-moderno" rows="2"></textarea></div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-5 pt-4 border-top">
+                    <button type="button" class="btn btn-light border fw-bold text-muted px-4 shadow-sm hover-efecto" id="btn-prev" onclick="window.ModActualizacion.cambiarPaso(-1)" style="display: none;"><i class="bi bi-arrow-left me-2"></i> Atrás</button>
+                    <button type="button" class="btn fw-bold px-5 shadow-sm hover-efecto ms-auto text-white" style="background: #8B5CF6; border-color: #8B5CF6;" id="btn-next" onclick="window.ModActualizacion.cambiarPaso(1)">Siguiente <i class="bi bi-arrow-right ms-2"></i></button>
+                    <button type="button" class="btn btn-success fw-bold px-5 shadow-sm hover-efecto ms-auto" id="btn-save" onclick="window.ModActualizacion.guardarActualizacion()" style="display: none;"><i class="bi bi-save me-2"></i> Guardar y Finalizar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

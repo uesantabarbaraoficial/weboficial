@@ -1,0 +1,158 @@
+<style>
+    .btn-tab { border: none; background: transparent; color: #6c757d; font-weight: bold; padding: 10px 20px; border-bottom: 3px solid transparent; transition: all 0.3s; }
+    .btn-tab.activo { color: #e11d48; border-bottom: 3px solid #e11d48; }
+    .btn-tab:hover:not(.activo) { color: #e11d48; background: rgba(225, 29, 72, 0.05); }
+    
+    /* ✨ ANIMACIÓN Y CRISTAL 3D ✨ */
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }
+
+    /* CSS Tarjetas del Visor */
+    .tarjeta-visor { break-inside: avoid; margin-bottom: 20px; background: #fff; border: 2px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .visor-grid { column-count: 2; column-gap: 20px; }
+    @media (max-width: 992px) { .visor-grid { column-count: 1; } }
+</style>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="burbuja-3d burbuja-3"></div>
+
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white text-danger mb-3 px-3 py-2 shadow-sm fw-bold" style="letter-spacing: 1px; font-size: 0.85rem;"><i class="bi bi-people-fill me-1"></i> ORGANIZACIÓN ESCOLAR</span>
+                    <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Colectivos Educativos</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Gestión de coordinaciones, brigadas y sus integrantes.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4 animate__animated animate__fadeIn">
+    <div class="col-12 text-center">
+        <div class="bg-white rounded-pill shadow-sm d-inline-flex p-1 border">
+            <button class="btn-tab activo rounded-pill px-4" id="tab-gestion" onclick="window.ModColectivos.cambiarPestana('gestion')"><i class="bi bi-pencil-square me-2"></i>Gestionar Colectivos</button>
+            <button class="btn-tab rounded-pill px-4" id="tab-visor" onclick="window.ModColectivos.cambiarPestana('visor')"><i class="bi bi-printer-fill me-2"></i>Visor y Reportes</button>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 animate__animated animate__fadeInUp" id="seccion-gestion">
+    <div class="col-md-4 col-xl-3">
+        <div class="card border-0 shadow-sm rounded-4 h-100" style="border-top: 5px solid #e11d48 !important;">
+            <div class="card-header bg-white border-bottom p-3 d-flex justify-content-between align-items-center rounded-top-4">
+                <h5 class="mb-0 fw-bold text-dark fs-6">Directorio</h5>
+                <button class="btn btn-sm text-white fw-bold shadow-sm hover-efecto" style="background: #e11d48;" onclick="window.ModColectivos.nuevoColectivo()" title="Crear Nuevo">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+            <div class="card-body p-0" style="max-height: 700px; overflow-y: auto;">
+                <div class="list-group list-group-flush" id="lista-colectivos">
+                    <div class="p-4 text-center text-muted"><div class="spinner-border spinner-border-sm text-danger" role="status"></div> Cargando...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 col-xl-9">
+        <div class="card border-0 shadow-sm rounded-4 h-100" id="panel-gestion" style="display: none;">
+            <div class="card-header bg-white border-bottom p-4 rounded-top-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <h4 class="mb-0 fw-bold text-dark" id="titulo-panel">Nuevo Colectivo</h4>
+                        <small class="text-muted">Llene la información de la organización y asigne a sus integrantes.</small>
+                    </div>
+                    <button type="button" class="btn btn-outline-danger fw-bold px-3 rounded-pill shadow-sm hover-efecto" id="btn-eliminar-col" onclick="window.ModColectivos.eliminarColectivo()">
+                        <i class="bi bi-trash3-fill me-1"></i>Eliminar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-4 p-md-5 bg-light rounded-bottom-4">
+                <form id="form-colectivo" onsubmit="event.preventDefault(); window.ModColectivos.guardarColectivo();">
+                    <input type="hidden" id="col-id">
+                    
+                    <div class="bg-white p-4 rounded-4 shadow-sm border mb-4">
+                        <h6 class="fw-bold text-danger mb-3 border-bottom pb-2"><i class="bi bi-info-circle-fill me-2"></i>Información General</h6>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label small fw-bold text-muted">Nombre de la Organización <span class="text-danger">*</span></label>
+                                <input type="text" class="input-moderno border-danger" id="col-nombre" placeholder="Ej: Brigada de Salud Escolar" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label small fw-bold text-muted">Descripción / Funciones</label>
+                                <textarea class="input-moderno" id="col-descripcion" rows="2" placeholder="Describa brevemente las funciones..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-4 shadow-sm border mb-4">
+                        <h6 class="fw-bold text-danger mb-3 border-bottom pb-2"><i class="bi bi-people-fill me-2"></i>Estructura y Personal</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Docente Asesor / Enlace Institucional</label>
+                                <select class="input-moderno text-dark" id="col-asesor">
+                                    <option value="">Cargando personal...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Vocero Principal</label>
+                                <select class="input-moderno text-dark" id="col-vocero">
+                                    <option value="">Cargando personal...</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-12 mt-3">
+                                <label class="form-label small fw-bold text-muted">Seleccione los Integrantes:</label>
+                                <div class="bg-light p-3 rounded-4 border" style="max-height: 250px; overflow-y: auto;">
+                                    <div id="contenedor-integrantes" class="row g-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-danger fw-bold px-5 shadow-sm rounded-pill hover-efecto py-2" id="btn-guardar-col">
+                            <i class="bi bi-floppy-fill me-2"></i>Guardar Colectivo Completo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 h-100 d-flex flex-column align-items-center justify-content-center p-5 text-center animate__animated animate__fadeIn" id="panel-vacio" style="min-height: 500px; background: #f8fafc;">
+            <div class="bg-white p-4 rounded-circle shadow-sm mb-4 text-danger border"><i class="bi bi-diagram-3-fill" style="font-size: 3rem;"></i></div>
+            <h4 class="fw-bold text-dark">Gestión de Colectivos</h4>
+            <p class="text-muted fs-6">Seleccione una organización de la lista para administrar sus integrantes,<br>o cree una nueva haciendo clic en el botón <b class="text-danger">+</b></p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 animate__animated animate__fadeInUp d-none" id="seccion-visor">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm rounded-4" style="border-top: 5px solid #e11d48 !important;">
+            <div class="card-header bg-white border-bottom p-4 d-flex justify-content-between align-items-center flex-wrap gap-3 rounded-top-4">
+                <div>
+                    <h5 class="mb-0 fw-bold text-dark"><i class="bi bi-grid-fill text-danger me-2"></i>Mapa de Colectivos</h5>
+                    <small class="text-muted">Vista global de todas las organizaciones y sus conformaciones.</small>
+                </div>
+                <button class="btn btn-danger fw-bold shadow-sm px-4 rounded-pill hover-efecto" onclick="window.ModColectivos.prepararPDF()">
+                    <i class="bi bi-file-earmark-pdf-fill me-1"></i> Imprimir Oficial
+                </button>
+            </div>
+            
+            <div class="card-body bg-light p-4 p-md-5 rounded-bottom-4">
+                <div id="visor-colectivos-exportar" class="visor-grid">
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>

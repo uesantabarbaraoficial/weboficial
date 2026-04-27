@@ -1,0 +1,162 @@
+<style>
+    .tarjeta-btn { background: white; border-radius: 16px; border: 2px solid transparent; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; position: relative; overflow: hidden; }
+    .tarjeta-btn:hover { transform: translateY(-8px); border-bottom-color: #f97316; box-shadow: 0 15px 35px rgba(249, 115, 22, 0.15) !important; }
+    .tarjeta-btn.bloqueado { opacity: 0.6; filter: grayscale(100%); cursor: not-allowed; border-bottom-color: #e2e8f0; pointer-events: none; }
+    
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }
+
+    /* ✨ ESTILOS DEL RUTOGRAMA TIPO METRO ✨ */
+    .timeline-rutograma { border-left: 4px solid #0dcaf0; margin-left: 20px; padding-left: 25px; position: relative; margin-top: 10px; padding-bottom: 5px; }
+    .timeline-node { position: relative; margin-bottom: 12px; }
+    .timeline-icon { position: absolute; left: -45px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; border-radius: 50%; background: white; border: 4px solid #0dcaf0; display: flex; align-items: center; justify-content: center; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 1.1rem; }
+    .timeline-icon.start { border-color: #f97316; color: #f97316; }
+    .timeline-icon.stop { border-color: #0dcaf0; color: #0dcaf0; }
+    .timeline-icon.end { border-color: #198754; color: #198754; border-radius: 8px; }
+    .timeline-content { background: #f8fafc; padding: 10px 15px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
+    .timeline-content:hover { background: white; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    
+    .btn-refrescar:hover i { display: inline-block; animation: girar 0.5s linear; }
+    @keyframes girar { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
+
+<div class="row mb-5 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #f97316 0%, #c2410c 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="burbuja-3d burbuja-3"></div>
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white mb-3 px-3 py-2 shadow-sm fw-bold" style="color: #c2410c; letter-spacing: 1px; font-size: 0.85rem;"><i class="bi bi-heart-pulse me-1"></i> SERVICIOS Y BIENESTAR</span>
+                    <h1 class="fw-bolder mb-2 text-white" style="font-size: 2.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">Transporte Escolar</h1>
+                    <p class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Rutas, paradas y monitoreo de unidades.</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block"><img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="transporte-dashboard" class="row g-4 animate__animated animate__fadeIn justify-content-center"></div>
+
+<div class="row mb-3 d-none animate__animated" id="btn-volver-dashboard">
+    <div class="col-12 text-center text-md-start">
+        <button class="btn btn-white shadow-sm fw-bold border rounded-pill px-4 hover-efecto" style="color: #c2410c;" onclick="window.ModTransporte.volverDashboard()">
+            <i class="bi bi-arrow-left me-2"></i>Volver al Menú
+        </button>
+    </div>
+</div>
+
+<div id="vista-paradas" class="row g-4 animate__animated d-none">
+    <div class="col-12 col-xl-4">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-info" style="border-radius: 20px;">
+            <h5 class="fw-bold text-dark mb-4" id="titulo-form-parada"><i class="bi bi-geo-alt-fill text-info me-2"></i>Registrar Parada</h5>
+            <div id="form-paradas-area">
+                <input type="text" id="txt-parada-nombre" class="input-moderno mb-3" placeholder="Nombre de Parada (Ej: Plaza Mayor)">
+                <textarea id="txt-parada-ref" class="form-control mb-3" rows="2" style="border-radius: 12px;" placeholder="Punto de referencia..."></textarea>
+                <button class="btn btn-info text-white fw-bold shadow-sm rounded-pill w-100 hover-efecto" id="btn-guardar-parada" onclick="window.ModTransporte.guardarParada()">Guardar</button>
+                <button class="btn btn-light fw-bold shadow-sm rounded-pill w-100 mt-2 border d-none hover-efecto" id="btn-cancelar-parada" onclick="window.ModTransporte.cancelarEdicionParada()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-8">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-warning" style="border-radius: 20px;">
+            <h5 class="fw-bold text-dark mb-4"><i class="bi bi-map text-warning me-2"></i>Directorio de Paradas</h5>
+            <div class="table-responsive border rounded-4"><table class="table table-hover align-middle mb-0"><thead class="bg-light"><tr><th class="ps-3">Nombre</th><th>Referencia</th><th class="text-end pe-3">Acción</th></tr></thead><tbody id="tabla-paradas"></tbody></table></div>
+        </div>
+    </div>
+</div>
+
+<div id="vista-rutas" class="row g-4 animate__animated d-none">
+    <div class="col-12 col-xl-5">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-primary" style="border-radius: 20px;">
+            <h5 class="fw-bold text-dark mb-4" id="titulo-form-ruta"><i class="bi bi-bus-front-fill text-primary me-2"></i>Armar Ruta</h5>
+            <div id="form-rutas-area">
+                <input type="text" id="txt-ruta-nombre" class="input-moderno mb-3 fw-bold" placeholder="Nombre Ruta (Ej: Ruta Norte)">
+                <input type="text" id="txt-ruta-chofer" class="input-moderno mb-3" placeholder="Nombre del Chofer">
+                
+                <label class="small fw-bold text-muted mb-1">Docente Guía de Transporte:</label>
+                <select id="sel-ruta-docente" class="form-select input-moderno mb-3 bg-light"><option value="">Seleccione Docente Responsable</option></select>
+                
+                <div class="row g-2 mb-4">
+                    <div class="col-6">
+                        <label class="small fw-bold text-muted mb-1">Válido Desde:</label>
+                        <input type="date" id="txt-ruta-desde" class="form-control input-moderno text-muted">
+                    </div>
+                    <div class="col-6">
+                        <label class="small fw-bold text-muted mb-1">Válido Hasta:</label>
+                        <input type="date" id="txt-ruta-hasta" class="form-control input-moderno text-muted">
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="small fw-bold text-muted mb-2">Añadir Parada al Recorrido:</label>
+                    <div class="input-group shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                        <select id="sel-add-parada" class="form-select bg-light border-primary border-end-0"></select>
+                        <button class="btn btn-primary fw-bold px-3" onclick="window.ModTransporte.agregarParadaARuta()">
+                            <i class="bi bi-plus-lg me-1"></i> Añadir
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="small fw-bold text-muted mb-3">Rutograma Interactivo:</label>
+                    <div id="visor-rutograma-vivo" class="ps-2"></div>
+                </div>
+
+                <button class="btn btn-primary fw-bold shadow-sm rounded-pill w-100 hover-efecto" id="btn-guardar-ruta" onclick="window.ModTransporte.guardarRuta()">Guardar Ruta</button>
+                <button class="btn btn-light fw-bold shadow-sm rounded-pill w-100 mt-2 border d-none hover-efecto" id="btn-cancelar-ruta" onclick="window.ModTransporte.cancelarEdicionRuta()">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-7">
+        <div class="tarjeta-modulo p-4 bg-white shadow-sm h-100 border-top border-5 border-success" style="border-radius: 20px;">
+            <h5 class="fw-bold text-dark mb-4"><i class="bi bi-signpost-split-fill text-success me-2"></i>Rutas Activas</h5>
+            <div class="table-responsive border rounded-4"><table class="table table-hover align-middle mb-0"><thead class="bg-light"><tr><th class="ps-3">Ruta</th><th>Personal</th><th class="text-center">Paradas</th><th class="text-end pe-3">Acción</th></tr></thead><tbody id="tabla-rutas"></tbody></table></div>
+        </div>
+    </div>
+</div>
+
+<div id="vista-operacion" class="row animate__animated d-none">
+    <div class="col-12 col-md-8 mx-auto">
+        <div class="tarjeta-modulo p-4 p-md-5 bg-white shadow-sm border-top border-5" style="border-radius: 20px; border-color: #6d28d9;">
+            
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4 flex-wrap gap-3">
+                <h4 class="fw-bold text-dark mb-0"><i class="bi bi-broadcast text-purple me-2" style="color: #6d28d9;"></i>Operación de Ruta</h4>
+                <div id="area-btn-masivo"></div>
+            </div>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6"><label class="small text-muted fw-bold mb-1">Ruta a operar</label><select id="op-sel-ruta" class="form-select input-moderno fw-bold border-purple" onchange="window.ModTransporte.cargarOperacion()"></select></div>
+                <div class="col-md-6"><label class="small text-muted fw-bold mb-1">Momento</label><select id="op-sel-momento" class="form-select input-moderno bg-light" onchange="window.ModTransporte.cargarOperacion()"><option value="Ida">Ida (Casa a Escuela)</option><option value="Retorno">Retorno (Escuela a Casa)</option></select></div>
+            </div>
+            
+            <div id="op-recorrido-area" class="py-3 px-2 border rounded-4 bg-light d-none"></div>
+        </div>
+    </div>
+</div>
+
+<div id="vista-visor" class="row animate__animated d-none">
+    <div class="col-12 col-md-9 mx-auto">
+        <div class="tarjeta-modulo p-4 p-md-5 bg-white shadow-sm border-top border-5 border-success" style="border-radius: 20px;">
+            <h4 class="fw-bold text-dark mb-4 border-bottom pb-3"><i class="bi bi-geo-alt-fill text-success me-2"></i>Seguimiento de la Unidad</h4>
+            
+            <div class="row g-3 mb-4 align-items-end">
+                <div class="col-md-5"><label class="small text-muted fw-bold mb-1">Buscar Ruta</label><select id="vis-sel-ruta" class="form-select input-moderno fw-bold border-success" onchange="window.ModTransporte.cargarVisor()"></select></div>
+                <div class="col-md-5"><label class="small text-muted fw-bold mb-1">Momento</label><select id="vis-sel-momento" class="form-select input-moderno bg-light" onchange="window.ModTransporte.cargarVisor()"><option value="Ida">Ida (Casa a Escuela)</option><option value="Retorno">Retorno (Escuela a Casa)</option></select></div>
+                
+                <div class="col-md-2 text-end text-md-start">
+                    <button class="btn btn-success btn-refrescar shadow-sm fw-bold border rounded-pill w-100 hover-efecto" title="Actualizar estado del recorrido" onclick="window.ModTransporte.refrescarVisor()">
+                        <i class="bi bi-arrow-clockwise me-1"></i> <span class="d-md-none d-lg-inline">Actualizar</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="vis-recorrido-area" class="py-3 px-2 border rounded-4 bg-light d-none"></div>
+        </div>
+    </div>
+</div>

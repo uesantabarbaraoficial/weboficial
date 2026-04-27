@@ -1,0 +1,314 @@
+<style>
+    /* Estilos del Wizard */
+    .wizard-steps { display: flex; justify-content: space-between; position: relative; margin-bottom: 2rem; }
+    .wizard-steps::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 4px; background: #e2e8f0; z-index: 1; transform: translateY(-50%); border-radius: 2px; }
+    .wizard-step { position: relative; z-index: 2; background: white; width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 4px solid #e2e8f0; color: #94a3b8; transition: all 0.3s; cursor: pointer; }
+    .wizard-step:hover { border-color: #0066FF; color: #0066FF; }
+    .wizard-step.activo { border-color: #0066FF; background: #0066FF; color: white; box-shadow: 0 0 15px rgba(0, 102, 255, 0.4); transform: scale(1.1); }
+    .wizard-step.completado { border-color: #0066FF; background: white; color: #0066FF; }
+    .step-title { position: absolute; top: 55px; font-size: 0.75rem; text-align: center; width: 120px; left: -37px; color: #64748b; font-weight: 600; pointer-events: none; }
+    .req { color: #e11d48; font-weight: bold; margin-left: 3px; }
+    .guia-campo { font-size: 0.7rem; color: #94a3b8; margin-top: 4px; display: block; font-style: italic; }
+
+    /* ✨ ESTILOS DE LAS BURBUJAS 3D ✨ */
+    @keyframes flotar-suave { 0% { transform: translateY(0) translateX(0) scale(1); } 33% { transform: translateY(-15px) translateX(10px) scale(1.02); } 66% { transform: translateY(10px) translateX(-10px) scale(0.98); } 100% { transform: translateY(0) translateX(0) scale(1); } }
+    .burbuja-3d { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.05) 50%, transparent 100%); box-shadow: inset -15px -15px 30px rgba(0, 0, 0, 0.15), inset 15px 15px 30px rgba(255, 255, 255, 0.3), 0 15px 35px rgba(0, 0, 0, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: none; }
+    .burbuja-1 { width: 300px; height: 300px; top: -100px; right: -50px; animation: flotar-suave 8s infinite ease-in-out; }
+    .burbuja-2 { width: 200px; height: 200px; bottom: -50px; right: 150px; animation: flotar-suave 12s infinite ease-in-out reverse; }
+    .burbuja-3 { width: 150px; height: 150px; top: 50px; left: 15%; animation: flotar-suave 10s infinite ease-in-out 1s; }
+</style>
+
+<div id="qr-temp" style="display:none;"></div>
+
+<div class="row mb-4 animate__animated animate__fadeInDown">
+    <div class="col-12">
+        <div class="banner-modulo p-4 p-md-5 text-white shadow-sm" style="background: linear-gradient(135deg, #0066FF 0%, #00C3FF 100%); border-radius: 24px; position: relative; overflow: hidden;">
+            
+            <div class="burbuja-3d burbuja-1"></div>
+            <div class="burbuja-3d burbuja-2"></div>
+            <div class="burbuja-3d burbuja-3"></div>
+
+            <div class="row align-items-center position-relative z-1">
+                <div class="col-md-9 text-center text-md-start mb-3 mb-md-0">
+                    <span class="badge bg-white text-primary mb-3 px-3 py-2 shadow-sm fw-bold"><i class="bi bi-person-plus-fill me-1"></i> ADMISIÓN ESCOLAR</span>
+                    <h1 class="fw-bolder mb-2 text-white">Solicitud de Cupo</h1>
+                    <p id="sol-periodo-texto" class="mb-0 fw-bold fs-5" style="color: rgba(255,255,255,0.9);">Proceso de admisión para el próximo período</p>
+                </div>
+                <div class="col-md-3 text-center text-md-end d-none d-md-block">
+                    <img src="assets/img/logo.png" alt="Logo Escuela" style="max-height: 130px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center animate__animated animate__fadeInUp">
+    <div class="col-xl-10">
+        <div class="tarjeta-modulo bg-white p-4 p-md-5 shadow-sm" style="border-radius: 24px;">
+            
+            <div class="wizard-steps px-3 px-md-5 mb-5 pb-4">
+                <div class="wizard-step activo" id="step-indicator-1" onclick="window.ModSolicitud.irAPaso(1)" title="Ir a Términos">1<span class="step-title">Términos</span></div>
+                <div class="wizard-step" id="step-indicator-2" onclick="window.ModSolicitud.irAPaso(2)" title="Ir a Representante">2<span class="step-title">Representante</span></div>
+                <div class="wizard-step" id="step-indicator-3" onclick="window.ModSolicitud.irAPaso(3)" title="Ir a Estudiante">3<span class="step-title">Estudiante</span></div>
+                <div class="wizard-step" id="step-indicator-4" onclick="window.ModSolicitud.irAPaso(4)" title="Ir a Académico">4<span class="step-title">Académico</span></div>
+                <div class="wizard-step" id="step-indicator-5" onclick="window.ModSolicitud.irAPaso(5)" title="Ir a Padres">5<span class="step-title">Padres</span></div>
+            </div>
+
+            <form id="form-solicitud">
+                <div id="paso-1" class="wizard-content">
+                    <h4 class="fw-bold text-dark mb-4 border-bottom pb-2"><i class="bi bi-file-earmark-text text-primary me-2"></i>Términos y Condiciones</h4>
+                    <div class="bg-light p-4 rounded-4 border mb-4 text-muted small">
+                        <p class="mb-2">Al completar esta solicitud, usted acepta que los datos suministrados son verdaderos y verificables. El envío de esta planilla no garantiza la asignación del cupo, la cual está sujeta a la disponibilidad de la Institución y los lineamientos del MPPE.</p>
+                        <p class="text-danger fw-bold mb-0 mt-3"><i class="bi bi-exclamation-triangle-fill me-1"></i> Los campos marcados con un asterisco rojo (*) son de carácter obligatorio.</p>
+                        <div class="form-check mt-3">
+                            <input class="form-check-input border-primary" type="checkbox" id="sol-acepto" style="transform: scale(1.2);">
+                            <label class="form-check-label fw-bold text-dark ms-2" for="sol-acepto">Acepto los términos y condiciones del proceso de admisión.</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="fw-bold text-muted small mb-1">Código Único de Solicitud</label>
+                            <input type="text" id="sol-codigo" class="input-moderno fw-bold text-primary bg-primary bg-opacity-10 border-primary" readonly>
+                            <span class="guia-campo">Al finalizar, podrá descargar una Planilla PDF con su Código QR.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="paso-2" class="wizard-content" style="display: none;">
+                    <h4 class="fw-bold text-dark mb-4 border-bottom pb-2"><i class="bi bi-person-badge text-primary me-2"></i>Datos del Representante Legal</h4>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold mb-1">Cédula de Identidad<span class="req">*</span></label>
+                            <input type="text" id="sol-rep-cedula" class="input-moderno" placeholder="Ej: 12345678" oninput="this.value = this.value.replace(/[^0-9VvEe-]/g, '')">
+                            <span class="guia-campo">Solo números. Use 'V-' o 'E-' si lo prefiere.</span>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="small text-muted fw-bold mb-1">Nombres y Apellidos Completos<span class="req">*</span></label>
+                            <input type="text" id="sol-rep-nombre" class="input-moderno" placeholder="Ej: Juan Alberto Pérez Gómez" onblur="window.ModSolicitud.formatearTexto(this)">
+                            <span class="guia-campo">Debe escribirlos en ese orden. Obligatorio incluir ambos apellidos si los posee.</span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted fw-bold mb-1">Teléfono Principal (WhatsApp)<span class="req">*</span></label>
+                            <input type="text" id="sol-rep-telefono" class="input-moderno fw-bold" placeholder="+58 400 0000000" oninput="window.ModSolicitud.formatearTelefono(this)">
+                            <span class="guia-campo">Se formateará automáticamente al estándar internacional.</span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted fw-bold mb-1">Correo Electrónico<span class="req">*</span></label>
+                            <input type="email" id="sol-rep-correo" class="input-moderno" placeholder="ejemplo@correo.com" onblur="this.value = this.value.toLowerCase().trim()">
+                            <span class="guia-campo">Asegúrese de que el correo esté activo.</span>
+                        </div>
+                        
+                        <div class="col-12 mt-4"><h6 class="fw-bold text-primary"><i class="bi bi-building me-1"></i>Datos Corporativos (Si selecciona "Comunidad", se bloquearán los campos)</h6></div>
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold mb-1">Tipo de Nómina<span class="req">*</span></label>
+                            <select id="sol-rep-nomina" class="form-select input-moderno" onchange="window.ModSolicitud.verificarNomina()"></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold mb-1" id="lbl-rep-filial">Negocio / Filial<span class="req">*</span></label>
+                            <select id="sol-rep-filial" class="form-select input-moderno"></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold mb-1" id="lbl-rep-gerencia">Organización / Gerencia<span class="req">*</span></label>
+                            <select id="sol-rep-gerencia" class="form-select input-moderno"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="paso-3" class="wizard-content" style="display: none;">
+                    <h4 class="fw-bold text-dark mb-4 border-bottom pb-2"><i class="bi bi-person-video text-primary me-2"></i>Datos del Aspirante</h4>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold mb-1">Cédula Escolar / Identidad<span class="req">*</span></label>
+                            <input type="text" id="sol-est-cedula" class="input-moderno" placeholder="Ej: 30123456">
+                            <span class="guia-campo">Si no posee cédula de identidad, indique la escolar.</span>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="small text-muted fw-bold mb-1">Nombres y Apellidos Completos<span class="req">*</span></label>
+                            <input type="text" id="sol-est-nombre" class="input-moderno" placeholder="Ej: María Fernanda López Díaz" onblur="window.ModSolicitud.formatearTexto(this)">
+                            <span class="guia-campo">Escríbalos estrictamente en ese orden.</span>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small text-muted fw-bold mb-1">Fecha de Nacimiento<span class="req">*</span></label>
+                            <input type="date" id="sol-est-fecha-nac" class="input-moderno text-muted">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small text-muted fw-bold mb-1">Género<span class="req">*</span></label>
+                            <select id="sol-est-genero" class="form-select input-moderno"><option value="">Seleccione...</option><option value="Masculino">Masculino</option><option value="Femenino">Femenino</option></select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small text-muted fw-bold mb-1">Número de Hijo<span class="req">*</span></label>
+                            <input type="number" id="sol-est-num-hijo" class="input-moderno" min="1" placeholder="Ej: 1">
+                            <span class="guia-campo">Orden entre sus hermanos.</span>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="small text-muted fw-bold mb-1">Parentesco con Rep.<span class="req">*</span></label>
+                            <select id="sol-est-parentesco" class="form-select input-moderno"></select>
+                            <span class="guia-campo">Vínculo legal.</span>
+                        </div>
+                        
+                        <div class="col-12 mt-3"><h6 class="fw-bold text-primary"><i class="bi bi-geo-alt-fill me-1"></i>Ubicación Geográfica</h6></div>
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold mb-1">Estado<span class="req">*</span></label>
+                            <input type="text" id="sol-est-estado" class="input-moderno bg-light fw-bold text-dark" value="Monagas" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold mb-1">Municipio<span class="req">*</span></label>
+                            <select id="sol-est-municipio" class="form-select input-moderno" onchange="window.ModSolicitud.llenarParroquias()"><option value="">Cargando...</option></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="small text-muted fw-bold mb-1">Parroquia<span class="req">*</span></label>
+                            <select id="sol-est-parroquia" class="form-select input-moderno" disabled><option value="">Seleccione Municipio...</option></select>
+                        </div>
+                        
+                        <div class="col-12 position-relative">
+                            <label class="small text-muted fw-bold mb-1">Dirección Exacta de Residencia<span class="req">*</span></label>
+                            <textarea id="sol-est-direccion" class="form-control input-moderno mb-1 border-primary" rows="2" placeholder="Ej: Escriba su sector, avenida o calle..." oninput="window.ModSolicitud.buscarDireccionWeb(this.value)"></textarea>
+                            <ul id="lista-direcciones-web" class="list-group position-absolute w-100 shadow-lg d-none animate__animated animate__fadeInIn" style="z-index: 1000; max-height: 220px; overflow-y: auto; top: 100%;"></ul>
+                            <div class="small text-end mt-1" style="font-size: 0.7rem; color: #94a3b8;">
+                                <i class="bi bi-globe-americas text-primary"></i> Asistente de direcciones por <b>OpenStreetMap</b>
+                            </div>
+                            <span class="guia-campo">Sea lo más detallado posible.</span>
+                        </div>
+                        
+                        <div class="col-12 mt-4"><h6 class="fw-bold text-primary"><i class="bi bi-bus-front me-1"></i>Servicio de Transporte</h6></div>
+                        <div class="col-md-6">
+                            <label class="small text-muted fw-bold mb-1">Ruta Solicitada<span class="req">*</span></label>
+                            <select id="sol-est-ruta" class="form-select input-moderno" onchange="window.ModSolicitud.filtrarParadas()"></select>
+                            <span class="guia-campo">Si usará transporte propio, seleccione "No requiere".</span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted fw-bold mb-1">Parada Específica<span class="req">*</span></label>
+                            <select id="sol-est-parada" class="form-select input-moderno" disabled><option value="">Seleccione ruta primero...</option></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="paso-4" class="wizard-content" style="display: none;">
+                    <h4 class="fw-bold text-dark mb-4 border-bottom pb-2"><i class="bi bi-mortarboard text-primary me-2"></i>Historial Académico</h4>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="small text-muted fw-bold mb-1">Grado, Año o Grupo a Cursar<span class="req">*</span></label>
+                            <select id="sol-est-grado" class="form-select input-moderno" onchange="window.ModSolicitud.autoAsignarNivel()"><option value="">Cargando grados...</option></select>
+                            <span class="guia-campo">Seleccione de la lista de oferta académica actual.</span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted fw-bold mb-1">Nivel Educativo Automático<span class="req">*</span></label>
+                            <input type="text" id="sol-est-nivel" class="input-moderno fw-bold" style="background-color: #f1f5f9; color: #475569;" readonly placeholder="Se asignará automáticamente...">
+                        </div>
+                        <div class="col-md-12 mt-4">
+                            <label class="small text-muted fw-bold mb-1">Colegio de Procedencia<span class="req">*</span></label>
+                            <input type="text" id="sol-est-procedencia" class="input-moderno" placeholder="Ej: CEI Josefa Camejo" onblur="window.ModSolicitud.formatearTexto(this)">
+                            <span class="guia-campo">Escriba el nombre del colegio anterior. Si es primera vez, coloque "Ninguno".</span>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="small text-muted fw-bold mb-1">Razón del Cambio de Institución<span class="req">*</span></label>
+                            <input type="text" id="sol-est-razon-cambio" class="input-moderno" placeholder="Ej: Mudanza, Inclusión laboral..." onblur="window.ModSolicitud.formatearTexto(this)">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted fw-bold mb-1">¿Proviene de una Escuela Técnica?<span class="req">*</span></label>
+                            <select id="sol-est-tecnica" class="form-select input-moderno"><option value="">Seleccione...</option><option value="No">No</option><option value="Sí">Sí</option></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small text-muted fw-bold mb-1 text-primary">Promedio o Literal del Último Año (Opcional)</label>
+                            <input type="text" id="sol-est-promedio" class="input-moderno border-primary" placeholder="Ej: 18 pts / A" oninput="this.value = this.value.toUpperCase()">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="paso-5" class="wizard-content" style="display: none;">
+                    <h4 class="fw-bold text-dark mb-4 border-bottom pb-2"><i class="bi bi-people text-primary me-2"></i>Reconocimiento Legal y Padres</h4>
+                    
+                    <div class="col-12 mb-4">
+                        <label class="small text-muted fw-bold mb-1">El estudiante está reconocido legalmente por:<span class="req">*</span></label>
+                        <select id="sol-reconocido" class="form-select input-moderno fw-bold text-primary" style="background-color: #f0fdf4; border-color: #16a34a;" onchange="window.ModSolicitud.cambiarReconocimiento()">
+                            <option value="">Seleccione...</option>
+                            <option value="Ambos Padres">Ambos Padres</option>
+                            <option value="Solo la Madre">Solo la Madre</option>
+                            <option value="Solo el Padre">Solo el Padre</option>
+                        </select>
+                        <span class="guia-campo">Al seleccionar una opción, se desplegarán los campos obligatorios correspondientes.</span>
+                    </div>
+                    
+                    <div id="bloque-madre" style="display: none;" class="mb-4">
+                        <h6 class="fw-bold text-secondary border-bottom pb-2"><i class="bi bi-person-hearts me-2 text-danger"></i>Datos de la Madre</h6>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="small text-muted fw-bold mb-1">Estatus Vital<span class="req">*</span></label>
+                                <select id="sol-madre-estatus" class="form-select input-moderno"><option value="">Seleccione</option><option value="Viva">Viva</option><option value="Fallecida">Fallecida</option></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="small text-muted fw-bold mb-1">Cédula<span class="req">*</span></label>
+                                <input type="text" id="sol-madre-cedula" class="input-moderno" placeholder="Ej: 12345678" oninput="this.value = this.value.replace(/[^0-9VvEe-]/g, '')">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small text-muted fw-bold mb-1">Nombres y Apellidos<span class="req">*</span></label>
+                                <input type="text" id="sol-madre-nombre" class="input-moderno" placeholder="En ese orden" onblur="window.ModSolicitud.formatearTexto(this)">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small text-muted fw-bold mb-1">Teléfono<span class="req">*</span></label>
+                                <input type="text" id="sol-madre-telefono" class="input-moderno" placeholder="+58 400 0000000" oninput="window.ModSolicitud.formatearTelefono(this)">
+                            </div>
+                            <div class="col-md-5">
+                                <label class="small text-muted fw-bold mb-1">Correo<span class="req">*</span></label>
+                                <input type="email" id="sol-madre-correo" class="input-moderno" placeholder="ejemplo@correo.com" onblur="this.value = this.value.toLowerCase().trim()">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="small text-muted fw-bold mb-1">¿Trabaja PDVSA?<span class="req">*</span></label>
+                                <select id="sol-madre-pdvsa" class="form-select input-moderno"><option value="">Seleccione</option><option value="No">No</option><option value="Sí">Sí</option></select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="small text-muted fw-bold mb-1">Dirección de Habitación<span class="req">*</span></label>
+                                <input type="text" id="sol-madre-direccion" class="input-moderno" placeholder="Ej: Sector, Urbanización, Calle, Nro. Casa..." onblur="window.ModSolicitud.formatearTexto(this)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="bloque-padre" style="display: none;" class="mb-4 mt-3">
+                        <h6 class="fw-bold text-secondary border-bottom pb-2"><i class="bi bi-person-fill me-2 text-primary"></i>Datos del Padre</h6>
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="small text-muted fw-bold mb-1">Estatus Vital<span class="req">*</span></label>
+                                <select id="sol-padre-estatus" class="form-select input-moderno"><option value="">Seleccione</option><option value="Vivo">Vivo</option><option value="Fallecido">Fallecido</option></select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="small text-muted fw-bold mb-1">Cédula<span class="req">*</span></label>
+                                <input type="text" id="sol-padre-cedula" class="input-moderno" placeholder="Ej: 12345678" oninput="this.value = this.value.replace(/[^0-9VvEe-]/g, '')">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="small text-muted fw-bold mb-1">Nombres y Apellidos<span class="req">*</span></label>
+                                <input type="text" id="sol-padre-nombre" class="input-moderno" placeholder="En ese orden" onblur="window.ModSolicitud.formatearTexto(this)">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small text-muted fw-bold mb-1">Teléfono<span class="req">*</span></label>
+                                <input type="text" id="sol-padre-telefono" class="input-moderno" placeholder="+58 400 0000000" oninput="window.ModSolicitud.formatearTelefono(this)">
+                            </div>
+                            <div class="col-md-5">
+                                <label class="small text-muted fw-bold mb-1">Correo<span class="req">*</span></label>
+                                <input type="email" id="sol-padre-correo" class="input-moderno" placeholder="ejemplo@correo.com" onblur="this.value = this.value.toLowerCase().trim()">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="small text-muted fw-bold mb-1">¿Trabaja PDVSA?<span class="req">*</span></label>
+                                <select id="sol-padre-pdvsa" class="form-select input-moderno"><option value="">Seleccione</option><option value="No">No</option><option value="Sí">Sí</option></select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="small text-muted fw-bold mb-1">Dirección de Habitación<span class="req">*</span></label>
+                                <input type="text" id="sol-padre-direccion" class="input-moderno" placeholder="Ej: Sector, Urbanización, Calle, Nro. Casa..." onblur="window.ModSolicitud.formatearTexto(this)">
+                            </div>
+                        </div>
+                    </div>
+                        
+                    <div class="col-12 mt-4 pt-3 border-top">
+                        <label class="small text-muted fw-bold mb-1 text-primary"><i class="bi bi-chat-text-fill me-1"></i>Observaciones Adicionales / Médicas (Opcional)</label>
+                        <textarea id="sol-observaciones" class="form-control bg-light" rows="3" style="border-radius: 15px; border-color: #e2e8f0;" placeholder="Indique alergias, condiciones especiales, medicamentos u otra información de interés." onblur="window.ModSolicitud.formatearTexto(this)"></textarea>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-5 pt-4 border-top">
+                    <button type="button" class="btn btn-light border fw-bold text-muted px-4 shadow-sm hover-efecto" id="btn-sol-prev" onclick="window.ModSolicitud.cambiarPaso(-1)" style="display: none;"><i class="bi bi-arrow-left me-2"></i> Atrás</button>
+                    <button type="button" class="btn btn-primary fw-bold px-5 shadow-sm hover-efecto ms-auto" id="btn-sol-next" onclick="window.ModSolicitud.cambiarPaso(1)">Siguiente Paso <i class="bi bi-arrow-right ms-2"></i></button>
+                    <button type="button" class="btn btn-success fw-bold px-5 shadow-sm hover-efecto ms-auto" id="btn-sol-save" onclick="window.ModSolicitud.guardarSolicitud()" style="display: none;"><i class="bi bi-send-fill me-2"></i>Enviar Solicitud</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
